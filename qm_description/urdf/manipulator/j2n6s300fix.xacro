@@ -147,7 +147,8 @@
 
         <xacro:kinova_virtual_link link_name="${prefix}_end_effector"/>
         <xacro:kinova_virtual_joint joint_name="${prefix}_joint_end_effector" type="${joint_end_effector_type}" parent="${prefix}_link_6" child="${prefix}_end_effector" joint_axis_xyz="${joint_end_effector_axis_xyz}" joint_origin_xyz="${joint_end_effector_origin_xyz}" joint_origin_rpy="${joint_end_effector_origin_rpy}" joint_lower_limit="0" joint_upper_limit="0"/>
-<!--     <xacro:kinova_3fingers link_hand="${prefix}_link_6" prefix="${prefix}_"/> -->
+    
+        <xacro:kinova_3fingers link_hand="${prefix}_link_6" prefix="${prefix}_"/>
     </xacro:macro>
 
 

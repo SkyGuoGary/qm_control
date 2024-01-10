@@ -1,4 +1,12 @@
 <launch>
+    <arg name="world" default="door_room"/>
+    <arg name="x" default="1.61"/>
+    <arg name="y" default="0.77"/>
+    <arg name="z" default="0.075"/>
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="3.3"/>
+
     <arg name="kinova_robotType" default="j2n6s300"/>
     <rosparam file="$(find qm_gazebo)/config/default.yaml" command="load"/>
 
@@ -7,7 +15,12 @@
 
     <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="paused" value="true"/>
+      <arg name="world_name" value="$(find qm_gazebo)/worlds/$(arg world).world"/>
+      <arg name="paused" value="true"/>
+      <arg name="use_sim_time" value="true"/>
+      <arg name="gui" value="true"/>
+      <arg name="debug" value="false"/>
+      <arg name="headless" default="false"/>
     </include>
 
     <!-- push robot_description to factory and spawn robot in gazebo -->
@@ -23,5 +36,4 @@
     -J $(arg kinova_robotType)_joint_6 -0.4
     "
     />
-
 </launch>
