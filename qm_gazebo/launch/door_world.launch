@@ -27,6 +27,7 @@
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" clear_params="true"
           output="screen"
           args="-param qm_description -urdf -model qm
+  
     -z 0.55
     -J $(arg kinova_robotType)_joint_1 3.14
     -J $(arg kinova_robotType)_joint_2 3.61
@@ -34,6 +35,7 @@
     -J $(arg kinova_robotType)_joint_4 2.7
     -J $(arg kinova_robotType)_joint_5 1.37
     -J $(arg kinova_robotType)_joint_6 -0.4
+    
     "
     />
 </launch>

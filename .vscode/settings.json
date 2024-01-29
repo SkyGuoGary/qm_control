@@ -1,0 +1,21 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/garyguo/gsk_qm/devel/lib/python3/dist-packages",
+        "/home/garyguo/ros_learning/devel/lib/python3/dist-packages",
+        "/home/garyguo/qm/devel/lib/python3/dist-packages",
+        "/home/garyguo/ocs2/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/usr/local/lib/python2.7/site-packages",
+        "/home/garyguo/raisim/raisimLib/raisim/linux/lib"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/garyguo/gsk_qm/devel/lib/python3/dist-packages",
+        "/home/garyguo/ros_learning/devel/lib/python3/dist-packages",
+        "/home/garyguo/qm/devel/lib/python3/dist-packages",
+        "/home/garyguo/ocs2/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/usr/local/lib/python2.7/site-packages",
+        "/home/garyguo/raisim/raisimLib/raisim/linux/lib"
+    ],
+    "cmake.configureOnOpen": true
+}

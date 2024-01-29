@@ -21,7 +21,7 @@
 
     <xacro:property name="J_PI" value="3.1415926535897931" />
 
-    <xacro:macro name="kinova_armlink" params="link_name link_mesh ring_mesh:=ring_big use_ring_mesh:=false mesh_no col:=true">
+    <xacro:macro name="kinova_armlink" params="link_name link_mesh ring_mesh:=ring_big use_ring_mesh:=false mesh_no col:=false">
       <link name="${link_name}">
           <visual>
               <geometry>
