@@ -1,5 +1,5 @@
 <launch>
-    <arg name="world" default="door_room"/>
+    <arg name="world" default="my_door_room"/>
     <arg name="x" default="1.61"/>
     <arg name="y" default="0.77"/>
     <arg name="z" default="0.075"/>
@@ -38,4 +38,6 @@
     
     "
     />
+    
+
 </launch>

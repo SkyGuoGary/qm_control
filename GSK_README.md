@@ -31,3 +31,6 @@ roslaunch qm_controllers rviz.launch
 roslaunch qm_gazebo empty_world_mpc.launch
 roslaunch qm_controllers load_controller_mpc.launch
 ```
+- 注意此时需按下三角按钮，开始仿真，控制器才能成功载入
+
+- 其他步骤完全一致

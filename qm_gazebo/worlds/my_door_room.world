@@ -309,7 +309,6 @@
           <limit>
             <lower>0</lower>
             <upper>0</upper>
-            <!-- <upper>1.58</upper> -->
           </limit>
           <dynamics>
             <damping>0.1</damping>
@@ -333,8 +332,8 @@
         <axis>
           <xyz expressed_in='__model__'>0 0 1</xyz>
           <limit>
-            <lower>0.01</lower>
-            <upper>1.58</upper>
+            <lower>0</lower>
+            <upper>0</upper>
           </limit>
           <dynamics>
             <damping>0.1</damping>
@@ -343,15 +342,6 @@
             <spring_stiffness>5</spring_stiffness>
           </dynamics>
         </axis>
-        <!-- <physics>
-          <ode>
-            <cfm_damping>1</cfm_damping>
-            <limit>
-              <cfm>0</cfm>
-              <erp>0.2</erp>
-            </limit>
-          </ode>
-        </physics> -->
       </joint>
       <joint name='world_joint' type='revolute'>
         <child>frame</child>
@@ -382,9 +372,9 @@
     </model>
     <state world_name='default'>
       <sim_time>77 114000000</sim_time>
-      <real_time>77 440548969</real_time>
-      <wall_time>1706540441 417728943</wall_time>
-      <iterations>77114</iterations>
+      <real_time>0 0</real_time>
+      <wall_time>1709217217 316951346</wall_time>
+      <iterations>0</iterations>
       <model name='ground_plane'>
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -400,21 +390,21 @@
         <scale>1 1 1</scale>
         <link name='door'>
           <pose>3.04651 -0.507827 2.03999 3.14159 2e-06 1.57744</pose>
-          <velocity>-0.000252 2e-06 -4e-06 1e-06 -0.000125 -8e-06</velocity>
-          <acceleration>-0.10071 -0.000128 0.002465 0.001668 -0.325383 -0.365735</acceleration>
-          <wrench>-4.16188 -0.005307 0.101859 0 -0 0</wrench>
+          <velocity>-0.000645 -1e-06 -1.6e-05 1e-06 -0.000125 -8e-06</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='frame'>
           <pose>3.10651 -0.508319 2e-06 1e-06 -0 0</pose>
-          <velocity>-1.5e-05 -0 -1e-06 -1e-06 -0.000242 1.1e-05</velocity>
-          <acceleration>-0.03254 -0.000531 -0.003086 -0.00119 -0.525649 0.011784</acceleration>
-          <wrench>-0.03254 -0.000531 -0.003086 0 -0 0</wrench>
+          <velocity>-1.5e-05 0 -1e-06 -1e-06 -0.000242 1.1e-05</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='handles'>
           <pose>3.04056 0.292149 1.04999 -3.14159 0.001591 -1.56415</pose>
           <velocity>-0.000119 3e-06 -4e-06 1e-06 -0.000122 -1.3e-05</velocity>
-          <acceleration>0.019499 0.013606 -0.006706 0.001294 -0.263223 -0.362353</acceleration>
-          <wrench>0.019499 0.013606 -0.006706 0 -0 0</wrench>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
@@ -423,7 +413,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>5.92608 -0.7678 2.43758 0 0.395642 2.92819</pose>
+        <pose>-4.9645 -1.90432 2.58958 0 0.099642 0.325004</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

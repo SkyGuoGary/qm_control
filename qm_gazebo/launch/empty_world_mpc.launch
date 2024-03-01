@@ -1,8 +1,12 @@
 <launch>
     <arg name="kinova_robotType" default="j2n6s300"/>
-    <rosparam file="$(find qm_gazebo)/config/default.yaml" command="load"/>
+    <rosparam file="$(find qm_gazebo)/config/test.yaml" command="load"/>
 
     <param name="qm_description" command="$(find xacro)/xacro 
+    $(find qm_description)/urdf/quadruped_manipulator/robot_mpc.xacro
+    "/>
+
+	<param name="robot_description" command="$(find xacro)/xacro 
     $(find qm_description)/urdf/quadruped_manipulator/robot_mpc.xacro
     "/>
 
@@ -24,9 +28,7 @@
     -J $(arg kinova_robotType)_joint_6 -0.4
     "
     />
-
-    <rosparam file="$(find qm_gazebo)/config/position_control.yaml" command="load"/>
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
           output="screen"
           args="
                 joint_1_position_controller joint_2_position_controller
@@ -34,6 +36,7 @@
                 joint_5_position_controller joint_6_position_controller
                 joint_state_controller
     "/>
+    
 
     <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"
           respawn="false" output="screen">
