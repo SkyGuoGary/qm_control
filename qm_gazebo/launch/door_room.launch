@@ -1,9 +1,6 @@
 <launch>
     <arg name="world" default="my_door_room"/>
 
-    <param name="qm_description" command="$(find xacro)/xacro $(find qm_description)/urdf/quadruped_manipulator/robot.xacro
-    "/>
-
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
       <arg name="world_name" value="$(find qm_gazebo)/worlds/$(arg world).world"/>
       <arg name="paused" value="true"/>

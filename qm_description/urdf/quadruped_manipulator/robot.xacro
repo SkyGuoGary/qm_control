@@ -6,7 +6,6 @@
     <xacro:include filename="$(find qm_description)/urdf/quadruped/robot.xacro" />
 
     <!-- manipulatior -->
-    <!--xacro:include filename="$(find qm_description)/urdf/manipulator/j2n6s300fix.xacro"/-->
     <xacro:include filename="$(find qm_description)/urdf/manipulator/j2n6s300fix.xacro"/>
 
     <link name="arm_base_link" />

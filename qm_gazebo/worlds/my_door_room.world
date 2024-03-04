@@ -332,14 +332,14 @@
         <axis>
           <xyz expressed_in='__model__'>0 0 1</xyz>
           <limit>
-            <lower>0</lower>
+            <lower>-1.57</lower>
             <upper>0</upper>
           </limit>
           <dynamics>
             <damping>0.1</damping>
             <friction>0.1</friction>
             <spring_reference>0</spring_reference>
-            <spring_stiffness>5</spring_stiffness>
+            <spring_stiffness>10</spring_stiffness>
           </dynamics>
         </axis>
       </joint>
