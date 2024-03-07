@@ -27,8 +27,8 @@ visualization_msgs::InteractiveMarker QmTargetTrajectoriesInteractiveMarker::cre
     // interactiveMarker.pose.orientation.z = 0.5;
     // interactiveMarker.pose.orientation.w = -0.5;
     interactiveMarker.pose.position.x = 0.55;
-    interactiveMarker.pose.position.y = 0.12;
-    interactiveMarker.pose.position.z = 1.05;
+    interactiveMarker.pose.position.y = 0.175;
+    interactiveMarker.pose.position.z = 1.07;
     interactiveMarker.pose.orientation.x = 0;
     interactiveMarker.pose.orientation.y = -0.707;
     interactiveMarker.pose.orientation.z = 0;
@@ -95,6 +95,23 @@ visualization_msgs::InteractiveMarker QmTargetTrajectoriesInteractiveMarker::cre
     interactiveMarker.controls.push_back(control);
 
     return interactiveMarker;
+}
+
+void QmTargetTrajectoriesInteractiveMarker::markerCallback(const visualization_msgs::InteractiveMarkerFeedback::ConstPtr &msg) {
+    const Eigen::Vector3d EePosition(msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
+    const Eigen::Quaterniond EeOrientation(msg->pose.orientation.w, msg->pose.orientation.x,
+                                           msg->pose.orientation.y, msg->pose.orientation.z);
+
+
+    // get TargetTrajectories
+    const auto targetTrajectories = goalPoseToTargetTrajectories_(EePosition, EeOrientation,
+                                                                  latestObservation_, latestObservationEe_);
+
+    // publish TargetTrajectories
+    targetTrajectoriesPublisher_->publishTargetTrajectories(targetTrajectories);
+
+    // update last ee target
+    lastEeTarget_ << EePosition, EeOrientation.coeffs();
 }
 
 void QmTargetTrajectoriesInteractiveMarker::processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback) {

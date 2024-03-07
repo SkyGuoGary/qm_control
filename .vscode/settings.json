@@ -17,5 +17,11 @@
         "/usr/local/lib/python2.7/site-packages",
         "/home/garyguo/raisim/raisimLib/raisim/linux/lib"
     ],
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "files.associations": {
+        "*.world": "html",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "tuple": "cpp"
+    }
 }

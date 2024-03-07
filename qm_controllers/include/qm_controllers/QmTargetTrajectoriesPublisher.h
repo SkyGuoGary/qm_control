@@ -103,6 +103,8 @@ public:
         };
         dogCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelCallback);
 
+        markerPoseSub_ = nh.subscribe<visualization_msgs::InteractiveMarkerFeedback>("/marker_pose", 1, boost::bind(&QmTargetTrajectoriesInteractiveMarker::markerCallback, this, _1));
+
         // interactive marker
         menuHandler_.insert("Send target pose", boost::bind(&QmTargetTrajectoriesInteractiveMarker::processFeedback, this, _1));
         auto interactiveMarker = createInteractiveMarker();
@@ -114,10 +116,11 @@ public:
 private:
     visualization_msgs::InteractiveMarker createInteractiveMarker() const;
     void processFeedback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr& feedback);
+    void markerCallback(const visualization_msgs::InteractiveMarkerFeedback::ConstPtr &msg);
 
     std::unique_ptr<TargetTrajectoriesRosPublisher> targetTrajectoriesPublisher_;
 
-    ::ros::Subscriber observationSub_, eePoseSub_, dogCmdVelSub_, eeCmdVelSub_;
+    ::ros::Subscriber observationSub_, eePoseSub_, dogCmdVelSub_, eeCmdVelSub_, markerPoseSub_;
 
     mutable std::mutex latestObservationMutex_, latestObservationEeMutex_;
     SystemObservation latestObservation_, latestObservationEe_;
