@@ -102,7 +102,8 @@ public:
             targetTrajectoriesPublisher_->publishTargetTrajectories(trajectories);
         };
         dogCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelCallback);
-
+        
+        //subscribe marker pose from rostopic
         markerPoseSub_ = nh.subscribe<visualization_msgs::InteractiveMarkerFeedback>("/marker_pose", 1, boost::bind(&QmTargetTrajectoriesInteractiveMarker::markerCallback, this, _1));
 
         // interactive marker

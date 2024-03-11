@@ -28,7 +28,8 @@ visualization_msgs::InteractiveMarker QmTargetTrajectoriesInteractiveMarker::cre
     // interactiveMarker.pose.orientation.w = -0.5;
     interactiveMarker.pose.position.x = 0.55;
     interactiveMarker.pose.position.y = 0.175;
-    interactiveMarker.pose.position.z = 1.07;
+    // interactiveMarker.pose.position.z = 1.07;
+    interactiveMarker.pose.position.z = 0.707;
     interactiveMarker.pose.orientation.x = 0;
     interactiveMarker.pose.orientation.y = -0.707;
     interactiveMarker.pose.orientation.z = 0;

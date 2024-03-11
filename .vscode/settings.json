@@ -22,6 +22,10 @@
         "*.world": "html",
         "unordered_map": "cpp",
         "unordered_set": "cpp",
-        "tuple": "cpp"
-    }
+        "tuple": "cpp",
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "enabledIfIncludesResolve"
 }

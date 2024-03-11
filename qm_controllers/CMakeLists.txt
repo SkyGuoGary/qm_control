@@ -92,7 +92,11 @@ target_link_libraries(qm_target_trajectories_publisher
      )
 target_compile_options(qm_target_trajectories_publisher PRIVATE ${OCS2_CXX_FLAGS})
 
-
+add_executable(marker_pose_publisher src/MarkerPosePublisher.cpp)
+target_link_libraries(marker_pose_publisher ${catkin_LIBRARIES})
+add_dependencies(marker_pose_publisher
+     ${catkin_EXPORTED_TARGETS}
+     )
 
 
 
