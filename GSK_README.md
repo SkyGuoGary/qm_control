@@ -26,7 +26,7 @@ roslaunch qm_controllers rviz.launch
 - 在load_qm_target窗口里输入trot等步态，待机器人稳定行走后才能任意修改位置
 
 ### MPC-only
-- 将前两步改为：
+- 将MPC-WBC的前两步改为：
 ```
 roslaunch qm_gazebo empty_world_mpc.launch
 roslaunch qm_controllers load_controller_mpc.launch
@@ -34,3 +34,17 @@ roslaunch qm_controllers load_controller_mpc.launch
 - 注意此时需按下三角按钮，开始仿真，控制器才能成功载入
 
 - 其他步骤完全一致
+
+### door-opening
+- 将MPC-WBC的前两步改为：
+```
+roslaunch qm_gazebo door_world.launch
+roslaunch qm_controllers load_controller_mpc.launch
+```
+- 注意此时需按下三角按钮，开始仿真，控制器才能成功载入
+
+- 待其他步骤完成后，启用marker控制：
+```
+rosrun qm_controllers marker_pose_publisher 0.1 0 0
+```
+- 开启后，拖动rviz中的方块即可开始沿轨迹移动

@@ -24,7 +24,7 @@
       <arg name="headless" default="false"/>
     </include>
 
-    <!-- this initial joint position param set is for door openning -->
+    <!-- this initial joint position param set is for handle grasping -->
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" clear_params="true"
           output="screen"
           args="-param qm_description -urdf -model qm
@@ -40,8 +40,8 @@
     
     "
     />
-    <!-- original initial joint postion:
-    -J $(arg kinova_robotType)_joint_1 3.14
+    <!-- original initial joint postion: -->
+    <!-- -J $(arg kinova_robotType)_joint_1 3.14
     -J $(arg kinova_robotType)_joint_2 3.61
     -J $(arg kinova_robotType)_joint_3 0.86
     -J $(arg kinova_robotType)_joint_4 2.7

@@ -103,7 +103,6 @@ void QmTargetTrajectoriesInteractiveMarker::markerCallback(const visualization_m
     const Eigen::Quaterniond EeOrientation(msg->pose.orientation.w, msg->pose.orientation.x,
                                            msg->pose.orientation.y, msg->pose.orientation.z);
 
-
     // get TargetTrajectories
     const auto targetTrajectories = goalPoseToTargetTrajectories_(EePosition, EeOrientation,
                                                                   latestObservation_, latestObservationEe_);

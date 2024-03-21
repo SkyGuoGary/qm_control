@@ -83,7 +83,7 @@ public:
                                                       latestObservation_, latestObservationEe_);
             targetTrajectoriesPublisher_->publishTargetTrajectories(trajectories);
         };
-        eeCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/ee_cmd_vel", 1, eeCmdVelCallback);
+        // eeCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/ee_cmd_vel", 1, eeCmdVelCallback);
 
         // cmd_vel subscriber
         auto cmdVelCallback = [this](const geometry_msgs::Twist::ConstPtr& msg) {
