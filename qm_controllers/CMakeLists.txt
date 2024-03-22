@@ -98,6 +98,12 @@ add_dependencies(marker_pose_publisher
      ${catkin_EXPORTED_TARGETS}
      )
 
+add_executable(gait_switch src/GaitSwitch.cpp)
+target_link_libraries(gait_switch ${catkin_LIBRARIES})
+add_dependencies(gait_switch
+        ${catkin_EXPORTED_TARGETS}
+        )
+
 
 
 
