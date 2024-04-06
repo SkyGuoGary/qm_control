@@ -8,12 +8,18 @@
 - attach the handle with a tiny invisible collision box, which can rotate together 
 - make it be in front of / behind the door collision 
 
-### Open collision of Kinova or not:
+### Modify configuration of Kinova:
 
-- open/close collision in 
+- open/close collision in line 24 of:
   
   ```
   qm_description/urdf/manipulator/common/kinova_common.xacro
+  ```
+
+- open grasp_fix_plugin in line 55 of:
+  
+  ```
+  qm_control/qm_description/urdf/manipulator/j2n6s300fix.xacro
   ```
 
 ### Modify the initial pose of rviz ball:
@@ -23,6 +29,7 @@
   ```
   qm_controllers/src/QmTargetTrajectoriesPublisher.cpp
   ```
+
 - then build it in terminal:
   
   ```
@@ -48,3 +55,17 @@
 - when need to keep the base static in trot mode:
   - set **/cmd_vel/angular/z** = 0.0047 and others = 0
 - **/ee_cmd_vel** is **NOT** good for ee target moving
+
+### /marker_cmd_vel
+
+- marker velocity controller
+
+- TODO:
+  
+  - angular velocity control
+  
+  - stop to wait for the real ee reaching
+
+### /gait_mode_cmd
+
+- use simple_gait.info with only **stance** and **trot** gait

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
-        //refresh marker_pose
+        //update marker_pose
         pose_x_vel = marker_vel.linear.x;
         pose_y_vel = marker_vel.linear.y;
         pose_z_vel = marker_vel.linear.z;

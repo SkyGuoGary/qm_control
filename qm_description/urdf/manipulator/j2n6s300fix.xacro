@@ -151,6 +151,28 @@
         <xacro:kinova_3fingers link_hand="${prefix}_link_6" prefix="${prefix}_"/>
     </xacro:macro>
 
+    <!-- gazebo grasp fix for ee gripper -->
+    <gazebo>
+		<plugin name="gazebo_grasp_fix" filename="libgazebo_grasp_fix.so">
+            <arm>
+                <arm_name>j2n6s300_gripper</arm_name>
+                <palm_link> j2n6s300_link_6  </palm_link>
+                <gripper_link> j2n6s300_link_finger_1 </gripper_link>
+                <gripper_link> j2n6s300_link_finger_2 </gripper_link>
+                <gripper_link> j2n6s300_link_finger_3 </gripper_link>
+                <gripper_link> j2n6s300_link_finger_tip_1 </gripper_link>
+                <gripper_link> j2n6s300_link_finger_tip_2 </gripper_link>
+                <gripper_link> j2n6s300_link_finger_tip_3 </gripper_link>
+            </arm>
+            <forces_angle_tolerance>100</forces_angle_tolerance>
+            <update_rate>4</update_rate>
+            <grip_count_threshold>4</grip_count_threshold>
+            <max_grip_count>8</max_grip_count>
+            <release_tolerance>0.01</release_tolerance>
+            <disable_collisions_on_attach>false</disable_collisions_on_attach>
+            <contact_topic>__default_topic__</contact_topic>
+        </plugin>
+	</gazebo>
 
 
 </root>
