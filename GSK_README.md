@@ -26,7 +26,7 @@
   roslaunch qm_controllers rviz.launch
   ```
 
-- 在rviz里增加初始位置的z值，并右键send position，此时机器人应当站起
+- 在rviz里根据需要调整初始位置，并右键send position，此时机器人应当站起
 
 - 在load_qm_target窗口里输入trot等步态，待机器人稳定行走后修改marker位置
 
@@ -54,9 +54,10 @@
 
 - 注意此时需按下三角按钮，开始仿真，控制器才能成功载入
 
-- 待其他步骤完成后，启用**步态切换器**和**marker控制**：
+- 待其他步骤完成后，启用**步态切换器**，**marker控制**，**动作控制**：
   
   ```
   rosrun qm_controllers gait_switch 
   rosrun qm_controllers marker_pose_publisher 
+  rosrun qm_controllers door_opening_planner 2
   ```

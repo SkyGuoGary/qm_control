@@ -18,7 +18,7 @@ using namespace legged_robot;
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "GaitSwitch");
+    ros::init(argc, argv, "gaitSwitch");
 
     ros::NodeHandle nh;
     ros::Rate loop_rate(10);
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     {
         if (is_converted)
         {
-            gaitCommand.switchGaitMode(gait_mode);
+            gaitCommand.switchGaitMode(sub_gait_mode);
         }
         ros::spinOnce();
         loop_rate.sleep();

@@ -135,18 +135,19 @@ namespace ocs2
 
 ros::Subscriber gait_mode_sub;
 
-std::string gait_mode;
+std::string sub_gait_mode;
 std::string curr_gait;
 bool is_converted = 0;
+std::string gaitCommandFile;
 
 void gaitCmdCallback(const std_msgs::String::ConstPtr &msg)
 {
-    gait_mode = msg->data;
-    if (gait_mode != curr_gait)
+    sub_gait_mode = msg->data;
+    if (sub_gait_mode != curr_gait)
     {
-        ROS_INFO("Switch gait mode to: %s", gait_mode.c_str());
+        std::cout<<"Command: Switch gait mode to: "<<sub_gait_mode.c_str()<<std::endl;
         is_converted = 1;
-        curr_gait = gait_mode;
+        curr_gait = sub_gait_mode;
         return;
     }
     is_converted = 0;

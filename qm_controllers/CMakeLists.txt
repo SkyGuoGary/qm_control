@@ -104,6 +104,12 @@ add_dependencies(gait_switch
         ${catkin_EXPORTED_TARGETS}
         )
 
+add_executable(door_opening_planner src/DoorOpeningPlanner.cpp)
+target_link_libraries(door_opening_planner ${catkin_LIBRARIES})
+add_dependencies(door_opening_planner
+        ${catkin_EXPORTED_TARGETS}
+        )
+
 
 
 
