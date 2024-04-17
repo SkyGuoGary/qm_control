@@ -19,12 +19,18 @@ using namespace legged_robot;
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "markerPosePub");
+    if(argc!=3)
+    {
+        ROS_ERROR("axis, rotate_ori");
+        return 0;
+    }
+    int param=std::stod(argv[2]);
 
     ros::NodeHandle nh;
     marker_pose_pub = nh.advertise<visualization_msgs::InteractiveMarkerFeedback>("/marker_pose", 10);
     ros::Rate loop_rate(f);
 
-    initial_pose = setInitPose();
+    initial_pose = setInitPose(); // only initailized, not real initail pose
     marker_feedback_sub = nh.subscribe<qm_msgs::ee_state>("/qm_mpc_observation_ee_state", 1, eeStateCallback);
     marker_vel_sub = nh.subscribe<geometry_msgs::Twist>("/marker_cmd_vel", 1, markerVelCallback);
 
@@ -36,15 +42,24 @@ int main(int argc, char **argv)
     }
     visualization_msgs::InteractiveMarkerFeedback marker_pose;
     marker_pose = initial_pose;
-
+    visualization_msgs::InteractiveMarkerFeedback center_point;
+    center_point.pose.position.x = 0.55;
+    center_point.pose.position.y = 0.175;
+    center_point.pose.position.z = 0.707;
+    center_point.pose.orientation.x = 0.0;
+    center_point.pose.orientation.y = sqrt(0.5);
+    center_point.pose.orientation.z = 0.0;
+    center_point.pose.orientation.w = sqrt(0.5);
     while (ros::ok())
     {
-        //update marker_pose
-        pose_x_vel = marker_vel.linear.x;
-        pose_y_vel = marker_vel.linear.y;
-        pose_z_vel = marker_vel.linear.z;
-        marker_pose = markerPoseVelControl(marker_pose, 1.0 / f, pose_x_vel, pose_y_vel, pose_z_vel);
-
+        // // update marker_pose
+        // pose_x_vel = marker_vel.linear.x;
+        // pose_y_vel = marker_vel.linear.y;
+        // pose_z_vel = marker_vel.linear.z;
+        // markerPoseVelControl(marker_pose, 1.0 / f, pose_x_vel, pose_y_vel, pose_z_vel);
+        double init_angle = 2.0 * acos(center_point.pose.orientation.w);
+        // 弧度制
+        markerPoseAngularPosControl(marker_pose, 1.0 / f, 0.1, argv[1], param);
         ros::spinOnce();
         loop_rate.sleep();
     }

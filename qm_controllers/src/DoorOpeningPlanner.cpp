@@ -70,7 +70,7 @@ void switch_gait_pub(myGaitKeyboardPublisher myGaitCommand, std::string gaitName
 }
 // subcribe grasping point
 visualization_msgs::InteractiveMarkerFeedback grasping_point;
-// stage 1: move to grasping point
+// move to grasping point
 void move_to_grasp()
 {
     grasping_point.pose.position.x = 2.99;
@@ -82,6 +82,11 @@ void move_to_grasp()
     grasping_point.pose.orientation.w = -0.707;
     grasping_pose_pub.publish(grasping_point);
     // grasping_pose_pub.publish(target);
+}
+// rotate handle, angle:degree
+void rotate_handle(double angle)
+{
+    
 }
 // stage 3: ungrasp handle and push door to a specific angle
 
@@ -141,7 +146,7 @@ int main(int argc, char **argv)
         {
             switch_gait_pub(gaitCommand, "stance");
         }
-        
+
         ros::spinOnce();
         loop_rate.sleep();
     }
