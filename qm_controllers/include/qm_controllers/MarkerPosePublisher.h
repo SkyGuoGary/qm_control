@@ -83,7 +83,7 @@ void markerPoseVelControl(
 
 // compute (x,y,z) of marker pose after rotation
 tf2::Vector3 translationRotate(const visualization_msgs::InteractiveMarkerFeedback curr,
-                               const geometry_msgs::Point center_point,
+                               const geometry_msgs::Vector3 center_point,
                                double step_angle, std::string rotation_axis)
 {
     // get current pose, center point, delta x&y&z
@@ -101,13 +101,15 @@ tf2::Vector3 translationRotate(const visualization_msgs::InteractiveMarkerFeedba
         double new_z = z_cen + y * sin(step_angle) + z * cos(step_angle);
         y = new_y;
         z = new_z;
+        x = curr.pose.position.x;
     }
     else if (rotation_axis == "y")
     {
         double new_x = x_cen + x * cos(step_angle) + z * sin(step_angle);
-        double new_z = z_cen + -x * sin(step_angle) + z * cos(step_angle);
+        double new_z = z_cen + (-x) * sin(step_angle) + z * cos(step_angle);
         x = new_x;
         z = new_z;
+        y = curr.pose.position.y;
     }
     else if (rotation_axis == "z")
     {
@@ -115,6 +117,7 @@ tf2::Vector3 translationRotate(const visualization_msgs::InteractiveMarkerFeedba
         double new_y = y_cen + x * sin(step_angle) + y * cos(step_angle);
         x = new_x;
         y = new_y;
+        z = curr.pose.position.z;
     }
     std::cout << "position:" << curr.pose.position;
 
@@ -124,7 +127,7 @@ tf2::Vector3 translationRotate(const visualization_msgs::InteractiveMarkerFeedba
 
 // compute (qx,qy,qz,qw) of marker pose after rotation
 tf2::Quaternion quatRotate(const visualization_msgs::InteractiveMarkerFeedback curr,
-                           const geometry_msgs::Point center_point,
+                           const geometry_msgs::Vector3 center_point,
                            double step_angle, std::string rotation_axis)
 {
     // calculate current marker's tf in world
@@ -170,7 +173,7 @@ tf2::Quaternion quatRotate(const visualization_msgs::InteractiveMarkerFeedback c
 // angular velocity control, won't stop
 void markerPoseAngularVelControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
-    const geometry_msgs::Point center_point,
+    const geometry_msgs::Vector3 center_point,
     double step_time, double angular_velocity, std::string rotation_axis,
     bool rotate_orientation = 1)
 {
@@ -203,7 +206,7 @@ void markerPoseAngularVelControl(
 // angular position control, will stop if angle reached target
 void markerPoseAngularPosControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
-    const geometry_msgs::Point center_point,
+    const geometry_msgs::Vector3 center_point,
     const double step_time, const double angular_velocity, const std::string rotation_axis,
     const double delta_angle, bool &is_rotated, bool rotate_orientation = 1)
 {
