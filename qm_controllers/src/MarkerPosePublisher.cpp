@@ -15,16 +15,17 @@
 using namespace ocs2;
 using namespace qm;
 using namespace legged_robot;
+bool is_rotated = 1;
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "markerPosePub");
-    if(argc!=3)
+    if (argc != 3)
     {
         ROS_ERROR("axis, rotate_ori");
         return 0;
     }
-    int param=std::stod(argv[2]);
+    int param = std::stoi(argv[2]);
 
     ros::NodeHandle nh;
     marker_pose_pub = nh.advertise<visualization_msgs::InteractiveMarkerFeedback>("/marker_pose", 10);
@@ -57,9 +58,18 @@ int main(int argc, char **argv)
         // pose_y_vel = marker_vel.linear.y;
         // pose_z_vel = marker_vel.linear.z;
         // markerPoseVelControl(marker_pose, 1.0 / f, pose_x_vel, pose_y_vel, pose_z_vel);
-        double init_angle = 2.0 * acos(center_point.pose.orientation.w);
+
         // 弧度制
-        markerPoseAngularPosControl(marker_pose, 1.0 / f, 0.1, argv[1], param);
+        // markerPoseAngularVelControl(marker_pose, 1.0 / f, 0.1, argv[1], param);
+        geometry_msgs::Point center;
+        center.x=0.55;
+        center.y=1;
+        center.z=1;
+        markerPoseAngularVelControl(marker_pose, center, 1.0 / f, 0.1, argv[1], param);
+        // if (is_rotated)
+        // {
+        //     markerPoseAngularPosControl(marker_pose, center, 1.0 / f, 0.1, argv[1], 1.57, is_rotated, param);
+        // }
         ros::spinOnce();
         loop_rate.sleep();
     }

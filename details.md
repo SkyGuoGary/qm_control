@@ -69,3 +69,7 @@
 ### /gait_mode_cmd
 
 - use simple_gait.info with only **stance** and **trot** gait
+
+### markerPoseAngularVelControl()
+
+- now can only rotate with a frame whose x/y/z axis is as same as world_frame (because it's hard to modify the translation part)

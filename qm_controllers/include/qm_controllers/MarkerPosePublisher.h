@@ -39,6 +39,7 @@ visualization_msgs::InteractiveMarkerFeedback initial_pose;
 visualization_msgs::InteractiveMarkerFeedback marker_pose;
 bool received_curr = 0;
 
+
 void eeStateCallback(const qm_msgs::ee_state::ConstPtr &obs)
 {
     initial_pose.pose.position.x = obs->state[0] + delta_x;
@@ -80,101 +81,164 @@ void markerPoseVelControl(
     marker_pose_pub.publish(curr);
 }
 
-// angular position control
-double roll, pitch, yaw;
-void markerPoseAngularPosControl(
-    visualization_msgs::InteractiveMarkerFeedback &curr,
-    double step_time, double angular_velocity, std::string rotation_axis,
-    bool rotate_orientation = 1)
+// compute (x,y,z) of marker pose after rotation
+tf2::Vector3 translationRotate(const visualization_msgs::InteractiveMarkerFeedback curr,
+                               const geometry_msgs::Point center_point,
+                               double step_angle, std::string rotation_axis)
 {
-    // check if marker have reached target angle
-    // double current_angle = 2.0 * acos(curr.pose.orientation.w);
-    // if (fabs(current_angle) >= fabs(init_angle+rotation_angle))
-    // {
-    //     ROS_INFO("Reached specified rotation angle!");
-    //     is_reached=1;
-    //     return;
-    // }
+    // get current pose, center point, delta x&y&z
+    double x_cen = center_point.x;
+    double y_cen = center_point.y;
+    double z_cen = center_point.z;
+    double x = curr.pose.position.x - x_cen;
+    double y = curr.pose.position.y - y_cen;
+    double z = curr.pose.position.z - z_cen;
 
-    // 计算旋转增量
-    double step_angle = angular_velocity * step_time;
-
-    geometry_msgs::Transform current_pose;
-    double x = curr.pose.position.x;
-    double y = curr.pose.position.y;
-    double z = curr.pose.position.z;
-    current_pose.rotation = curr.pose.orientation;
-
-    // 更新xyz坐标
+    // update translation part
     if (rotation_axis == "x")
     {
-        // 绕X轴旋转
-        double new_y = y * cos(step_angle) - z * sin(step_angle);
-        double new_z = y * sin(step_angle) + z * cos(step_angle);
+        double new_y = y_cen + y * cos(step_angle) - z * sin(step_angle);
+        double new_z = z_cen + y * sin(step_angle) + z * cos(step_angle);
         y = new_y;
         z = new_z;
     }
     else if (rotation_axis == "y")
     {
-        // 绕Y轴旋转
-        double new_x = x * cos(step_angle) + z * sin(step_angle);
-        double new_z = -x * sin(step_angle) + z * cos(step_angle);
+        double new_x = x_cen + x * cos(step_angle) + z * sin(step_angle);
+        double new_z = z_cen + -x * sin(step_angle) + z * cos(step_angle);
         x = new_x;
         z = new_z;
     }
     else if (rotation_axis == "z")
     {
-        // 绕Z轴旋转
-        double new_x = x * cos(step_angle) - y * sin(step_angle);
-        double new_y = x * sin(step_angle) + y * cos(step_angle);
+        double new_x = x_cen + x * cos(step_angle) - y * sin(step_angle);
+        double new_y = y_cen + x * sin(step_angle) + y * cos(step_angle);
         x = new_x;
         y = new_y;
     }
-    // if you want to rotate ee orientation together
+    std::cout << "position:" << curr.pose.position;
+
+    tf2::Vector3 res_point(x, y, z);
+    return res_point;
+}
+
+// compute (qx,qy,qz,qw) of marker pose after rotation
+tf2::Quaternion quatRotate(const visualization_msgs::InteractiveMarkerFeedback curr,
+                           const geometry_msgs::Point center_point,
+                           double step_angle, std::string rotation_axis)
+{
+    // calculate current marker's tf in world
+    tf2::Vector3 translation_of_curr(curr.pose.position.x, curr.pose.position.y, curr.pose.position.z);
+    tf2::Quaternion curr_quat_inW(curr.pose.orientation.x, curr.pose.orientation.y, curr.pose.orientation.z, curr.pose.orientation.w);
+    tf2::Transform tf_of_curr_inW(curr_quat_inW, translation_of_curr);
+
+    // center frame's origin in world
+    tf2::Vector3 translation_of_C_O;
+    tf2::fromMsg(center_point, translation_of_C_O);
+    // center frame's quat in world, default is as same as world
+    tf2::Quaternion quat_of_CinW(0, 0, 0, 1);
+    // center frame's tf in world
+    tf2::Transform tf_of_CinW(quat_of_CinW, translation_of_C_O);
+
+    // calculate current marker's tf in center frame
+    tf2::Transform tf_of_curr_inC = tf_of_CinW.inverse() * tf_of_curr_inW;
+
+    // rotate marker according to RPY of curr in center frame
+    tf2::Quaternion tmp = tf_of_curr_inC.getRotation();
+    double roll, pitch, yaw;
+    tf2::Matrix3x3(tmp).getRPY(roll, pitch, yaw);
+    if (rotation_axis == "x")
+        roll += step_angle;
+    else if (rotation_axis == "y")
+        pitch += step_angle;
+    else if (rotation_axis == "z")
+        yaw += step_angle;
+    else
+        ROS_ERROR("NO AXIS SPECIFIED!");
+    std::cout << "rpy: " << roll << " " << pitch << " " << yaw << std::endl;
+
+    // change tmp
+    tmp.setRPY(roll, pitch, yaw);
+    // new marker's tf in center frame
+    tf2::Transform tf_of_new_inC;
+    tf_of_new_inC.setRotation(tmp);
+    // calculate new marker's tf in world
+    tf2::Transform tf_of_new_inW = tf_of_CinW * tf_of_new_inC;
+    return tf_of_new_inW.getRotation();
+}
+
+// angular velocity control, won't stop
+void markerPoseAngularVelControl(
+    visualization_msgs::InteractiveMarkerFeedback &curr,
+    const geometry_msgs::Point center_point,
+    double step_time, double angular_velocity, std::string rotation_axis,
+    bool rotate_orientation = 1)
+{
+    // rotation angle increment in every step
+    double step_angle = angular_velocity * step_time;
+
+    tf2::Vector3 res_translation;
+    tf2::Quaternion res_quat;
+
+    res_translation=translationRotate(curr, center_point, step_angle, rotation_axis);
+
+    // if you want to rotate marker orientation together
     if (rotate_orientation)
     {
-        // 转为tf的四元数
-        tf2::Quaternion rotation_quaternion;
-        tf2::fromMsg(current_pose.rotation, rotation_quaternion);
-
-        // // set rotation axis vector
-        // tf2::Vector3 axis;
-        // if (rotation_axis == "x")
-        //     axis.setValue(1.0, 0.0, 0.0);
-        // if (rotation_axis == "y")
-        //     axis.setValue(0.0, 1.0, 0.0);
-        // if (rotation_axis == "z")
-        //     axis.setValue(0.0, 0.0, 1.0);
-
-        // // 构建绕点旋转的变换矩阵
-        // tf2::Matrix3x3 rotation_matrix(rotation_quaternion);
-        // // 计算当前旋转轴在世界坐标系中的方向
-        // tf2::Vector3 world_axis = rotation_matrix * axis;
-
-        // // 更新四元数
-        // tf2::Quaternion rotation_increment(world_axis, step_angle);
-        // rotation_quaternion = rotation_quaternion * rotation_increment;
-
-        // // 将更新后的四元数转换回geometry_msgs::Quaternion
-        // current_pose.rotation = tf2::toMsg(rotation_quaternion);
-
-        tf2::Matrix3x3(rotation_quaternion).getRPY(roll, pitch, yaw);
-        if (rotation_axis == "x")
-            roll += step_angle;
-        if (rotation_axis == "y")
-            pitch += step_angle;
-        if (rotation_axis == "z")
-            yaw += step_angle;
-        rotation_quaternion.setRPY(roll, pitch, yaw);
-        std::cout << "rpy: " << roll << " " << pitch << " " << yaw << std::endl;
-        current_pose.rotation = tf2::toMsg(rotation_quaternion);
+        std::cout<<"rotate orientation"<<std::endl;
+        res_quat=quatRotate(curr, center_point, step_angle, rotation_axis);
+        curr.pose.orientation.x=res_quat.x();
+        curr.pose.orientation.y=res_quat.y();
+        curr.pose.orientation.z=res_quat.z();
+        curr.pose.orientation.w=res_quat.w();
     }
+    std::cout<<std::endl;
+    curr.pose.position.x=res_translation.x();
+    curr.pose.position.y=res_translation.y();
+    curr.pose.position.z=res_translation.z();
 
-    curr.pose.position.x = x;
-    curr.pose.position.y = y;
-    curr.pose.position.z = z;
-    curr.pose.orientation = current_pose.rotation;
+    marker_pose_pub.publish(curr);
+}
 
-    std::cout << "position:" << curr.pose.position << std::endl;
+// angular position control, will stop if angle reached target
+void markerPoseAngularPosControl(
+    visualization_msgs::InteractiveMarkerFeedback &curr,
+    const geometry_msgs::Point center_point,
+    const double step_time, const double angular_velocity, const std::string rotation_axis,
+    const double delta_angle, bool &is_rotated, bool rotate_orientation = 1)
+{
+    // rotation angle increment in every step
+    double step_angle = angular_velocity * step_time;
+
+    // check if marker has reached target angle
+    static double accumulated_angle = 0;
+    accumulated_angle += step_angle;
+    if (accumulated_angle >= delta_angle)
+    {
+        step_angle = delta_angle - (accumulated_angle - step_angle);
+        is_rotated = 0;
+        accumulated_angle = 0;
+    }
+    std::cout << "acc_angle: " << accumulated_angle << std::endl;
+
+    tf2::Vector3 res_translation;
+    tf2::Quaternion res_quat;
+
+    res_translation=translationRotate(curr, center_point, step_angle, rotation_axis);
+
+    // if you want to rotate marker orientation together
+    if (rotate_orientation)
+    {
+        res_quat=quatRotate(curr, center_point, step_angle, rotation_axis);
+        curr.pose.orientation.x=res_quat.x();
+        curr.pose.orientation.y=res_quat.y();
+        curr.pose.orientation.z=res_quat.z();
+        curr.pose.orientation.w=res_quat.w();
+    }
+    std::cout<<std::endl;
+    curr.pose.position.x=res_translation.x();
+    curr.pose.position.y=res_translation.y();
+    curr.pose.position.z=res_translation.z();
+
     marker_pose_pub.publish(curr);
 }
