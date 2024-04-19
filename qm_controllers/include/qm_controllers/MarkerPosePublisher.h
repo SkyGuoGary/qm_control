@@ -201,7 +201,7 @@ tf2::Transform poseRotate(const visualization_msgs::InteractiveMarkerFeedback cu
     // rotate marker according to RPY of curr in center frame
     tf2::Quaternion tmp = tf_of_curr_inC.getRotation();
     double roll, pitch, yaw;
-    tf2::Matrix3x3(tmp).getRPY(roll, pitch, yaw);
+    tf2::Matrix3x3(tmp).getRPY(roll, pitch, yaw,2);
     if (rotation_axis == "x")
         roll += step_angle;
     else if (rotation_axis == "y")
