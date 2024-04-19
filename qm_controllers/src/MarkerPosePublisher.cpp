@@ -62,20 +62,24 @@ int main(int argc, char **argv)
         // 弧度制
         // markerPoseAngularVelControl(marker_pose, 1.0 / f, 0.1, argv[1], param);
 
-        tf2::Vector3 center1(0.55, 1, 1);
-        geometry_msgs::Vector3 center = tf2::toMsg(center1);
+        tf2::Vector3 center_(0.7, 0, 0.7);
+        geometry_msgs::Vector3 center = tf2::toMsg(center_);
 
-        tf2::Quaternion quat1(0, 0, 0, 1);
-        geometry_msgs::Quaternion center_frame_quat = tf2::toMsg(quat1);
-        
+        // tf2::Quaternion quat1(0, 1/sqrt(2), 0, 1/sqrt(2)); // rotate 90 degree around world_Y
+        tf2::Quaternion quat_(0, 0, 0, 1); // translate origin only
+        geometry_msgs::Quaternion center_frame_quat = tf2::toMsg(quat_);
+
         double omega = 0.1;
+        double step_time = 1.0 / f;
 
-        markerPoseAngularVelControl(marker_pose, center,
-                                    1.0 / f, omega, argv[1], param);
-        // if (is_rotated)
-        // {
-        //     markerPoseAngularPosControl(marker_pose, center, 1.0 / f, 0.1, argv[1], 1.57, is_rotated, param);
-        // }
+        // markerPoseAngularVelControl(marker_pose, center,
+        //                             step_time, omega, argv[1], param);
+        if (is_rotated)
+        {
+            markerPoseAngularPosControl(
+                marker_pose, center, center_frame_quat, 
+                step_time, omega, argv[1], 1.57, is_rotated, param);
+        }
         ros::spinOnce();
         loop_rate.sleep();
     }
