@@ -58,18 +58,18 @@
 
 ### /marker_cmd_vel
 
-- marker velocity controller
+- marker linear velocity controller 
+
+- angular vel & pos control around any axis of any frame
 
 - TODO:
   
-  - angular velocity control
+  - solve gimbal lock by modify rotate method (now: RPY)
   
-  - stop to wait for the real ee reaching
+  - 
 
 ### /gait_mode_cmd
 
 - use simple_gait.info with only **stance** and **trot** gait
 
-### markerPoseAngularVelControl()
 
-- now can only rotate with a frame whose x/y/z axis is as same as world_frame (because it's hard to modify the translation part)

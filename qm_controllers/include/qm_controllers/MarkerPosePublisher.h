@@ -72,15 +72,71 @@ visualization_msgs::InteractiveMarkerFeedback setInitPose()
 // position vel control
 void markerPoseVelControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
-    double step_time, double v_x, double v_y, double v_z)
+    double step_time, geometry_msgs::Vector3 linear_vel)
 {
+    double v_x = linear_vel.x;
+    double v_y = linear_vel.y;
+    double v_z = linear_vel.z;
     curr.pose.position.x += v_x * step_time;
     curr.pose.position.y += v_y * step_time;
     curr.pose.position.z += v_z * step_time;
     marker_pose_pub.publish(curr);
 }
 
-// compute (x,y,z) of marker pose after rotation
+geometry_msgs::Vector3 setLinearVel(double dx, double dy, double dz, double max_v)
+{
+    geometry_msgs::Vector3 linear_v;
+    double d_max = std::max(dx, std::max(dy, dz));
+    double k = max_v / d_max;
+    linear_v.x = dx * k;
+    linear_v.y = dy * k;
+    linear_v.z = dz * k;
+    std::cout<<linear_v;
+    return linear_v;
+}
+/**@brief position control
+ * @param max_vel max(vx,vy,vz), would better not more than 0.2 (m/s)
+ * @param order 0: move towards target in a straight path; 1:move along Z axis firstly*/
+void markerPosePosControl(
+    visualization_msgs::InteractiveMarkerFeedback &curr,
+    const geometry_msgs::Vector3 target,
+    double step_time, double max_vel, bool &reached, int order = 0)
+{
+
+    double x = curr.pose.position.x, y = curr.pose.position.y, z = curr.pose.position.z;
+    double dx = target.x - x, dy = target.y - y, dz = target.z - z;
+    if (fabs(dx) < 0.005 && fabs(dy) < 0.005 && fabs(dz) < 0.005)
+    {
+        reached = 1;
+        ROS_INFO("Reached target");
+        return;
+    }
+
+    geometry_msgs::Vector3 linear_vel;
+    if (order == 0)
+    {
+        linear_vel = setLinearVel(dx, dy, dz, max_vel);
+    }
+    else if (order == 1)
+    {
+        if (fabs(dz) > 0.005)
+        {
+            linear_vel.x = 0;
+            linear_vel.y = 0;
+            linear_vel.z = max_vel;
+        }
+        else
+        {
+            linear_vel = setLinearVel(dx, dy, dz, max_vel);
+        }
+    }
+    curr.pose.position.x += std::min(linear_vel.x * step_time, target.x - x);
+    curr.pose.position.y += std::min(linear_vel.y * step_time, target.y - y);
+    curr.pose.position.z += std::min(linear_vel.z * step_time, target.z - z);
+    marker_pose_pub.publish(curr);
+}
+
+// compute relative (x,y,z) of marker pose after rotation
 tf2::Vector3 translationRotate(const visualization_msgs::InteractiveMarkerFeedback relative_position,
                                double step_angle, std::string rotation_axis)
 {
@@ -201,7 +257,7 @@ tf2::Transform poseRotate(const visualization_msgs::InteractiveMarkerFeedback cu
     // rotate marker according to RPY of curr in center frame
     tf2::Quaternion tmp = tf_of_curr_inC.getRotation();
     double roll, pitch, yaw;
-    tf2::Matrix3x3(tmp).getRPY(roll, pitch, yaw,2);
+    tf2::Matrix3x3(tmp).getRPY(roll, pitch, yaw, 2);
     if (rotation_axis == "x")
         roll += step_angle;
     else if (rotation_axis == "y")
@@ -217,7 +273,7 @@ tf2::Transform poseRotate(const visualization_msgs::InteractiveMarkerFeedback cu
     tf_of_new_inC.setRotation(tmp);
     // calculate new marker's tf in world
     tf_of_new_inW = tf_of_CinW * tf_of_new_inC;
-    
+
     // set new marker's translation
     tf_of_new_inW.setOrigin(trans_of_new_inW);
     return tf_of_new_inW;

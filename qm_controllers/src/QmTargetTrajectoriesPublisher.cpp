@@ -9,6 +9,9 @@
 #include <ocs2_robotic_tools/common/RotationTransforms.h>
 #include <ocs2_ros_interfaces/command/TargetTrajectoriesRosPublisher.h>
 
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Transform.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 namespace qm {
 using namespace ocs2;
 
@@ -26,14 +29,18 @@ visualization_msgs::InteractiveMarker QmTargetTrajectoriesInteractiveMarker::cre
     // interactiveMarker.pose.orientation.y = -0.5;
     // interactiveMarker.pose.orientation.z = 0.5;
     // interactiveMarker.pose.orientation.w = -0.5;
+
     interactiveMarker.pose.position.x = 0.55;
     interactiveMarker.pose.position.y = 0.175;
     // interactiveMarker.pose.position.z = 1.07;
     interactiveMarker.pose.position.z = 0.707;
-    interactiveMarker.pose.orientation.x = 0;
-    interactiveMarker.pose.orientation.y = -0.707;
-    interactiveMarker.pose.orientation.z = 0;
-    interactiveMarker.pose.orientation.w = -0.707;
+    
+    tf2::Quaternion quat_(0, 1/sqrt(0.5), 0, 1/sqrt(0.5));
+    quat_=quat_.normalize();
+    interactiveMarker.pose.orientation.x = quat_.x();
+    interactiveMarker.pose.orientation.y = quat_.y();
+    interactiveMarker.pose.orientation.z = quat_.z();
+    interactiveMarker.pose.orientation.w = quat_.w();
     // create a grey box marker
     const auto boxMarker = []() {
         visualization_msgs::Marker marker;

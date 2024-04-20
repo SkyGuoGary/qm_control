@@ -76,10 +76,12 @@ void move_to_grasp()
     grasping_point.pose.position.x = 2.99;
     grasping_point.pose.position.y = 0.175;
     grasping_point.pose.position.z = 1.068;
-    grasping_point.pose.orientation.x = 0;
-    grasping_point.pose.orientation.y = -0.707;
-    grasping_point.pose.orientation.z = 0;
-    grasping_point.pose.orientation.w = -0.707;
+    tf2::Quaternion grasp_quat_(0,1/sqrt(2),0,1/sqrt(2));
+    grasp_quat_.normalize();
+    grasping_point.pose.orientation.x = grasp_quat_.x();
+    grasping_point.pose.orientation.y = grasp_quat_.y();
+    grasping_point.pose.orientation.z = grasp_quat_.z();
+    grasping_point.pose.orientation.w = grasp_quat_.w();
     grasping_pose_pub.publish(grasping_point);
     // grasping_pose_pub.publish(target);
 }

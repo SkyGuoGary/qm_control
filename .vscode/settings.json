@@ -87,7 +87,8 @@
         "valarray": "cpp",
         "variant": "cpp",
         "bit": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "future": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabledIfIncludesResolve"
 }

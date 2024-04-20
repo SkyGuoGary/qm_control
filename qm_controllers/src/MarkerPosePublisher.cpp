@@ -16,16 +16,17 @@ using namespace ocs2;
 using namespace qm;
 using namespace legged_robot;
 bool is_rotated = 1;
+bool reached = 0;
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "markerPosePub");
-    if (argc != 3)
+    if (argc != 2)
     {
-        ROS_ERROR("axis, rotate_ori");
+        ROS_ERROR("move order");
         return 0;
     }
-    int param = std::stoi(argv[2]);
+    int param = std::stoi(argv[1]);
 
     ros::NodeHandle nh;
     marker_pose_pub = nh.advertise<visualization_msgs::InteractiveMarkerFeedback>("/marker_pose", 10);
@@ -53,35 +54,45 @@ int main(int argc, char **argv)
     center_point.pose.orientation.w = sqrt(0.5);
     while (ros::ok())
     {
-        // // update marker_pose
-        // pose_x_vel = marker_vel.linear.x;
-        // pose_y_vel = marker_vel.linear.y;
-        // pose_z_vel = marker_vel.linear.z;
-        // markerPoseVelControl(marker_pose, 1.0 / f, pose_x_vel, pose_y_vel, pose_z_vel);
-
-        
-        tf2::Vector3 center_(0.7, 0, 0.7);
-        geometry_msgs::Vector3 center = tf2::toMsg(center_);
-
-        // when 
-        tf2::Quaternion quat_(0, 1/sqrt(2), 0, 1/sqrt(2)); // rotate 90 degree around world_Y
-        // tf2::Quaternion quat_(0, 0, 0, 1); // translate origin only
-        geometry_msgs::Quaternion center_frame_quat = tf2::toMsg(quat_);
-        
-        double omega = 0.1;
         double step_time = 1.0 / f;
-        double desired_angle = 0.5*M_PI;
-        std::string axis=argv[1];
+        //subscribe pos_vel from /marker_cmd_vel
+        tf2::Vector3 pos_vel_(marker_vel.linear.x, marker_vel.linear.y, marker_vel.linear.z);
+        geometry_msgs::Vector3 pos_vel=tf2::toMsg(pos_vel_);
+
+        // markerPoseVelControl(marker_pose, step_time, pos_vel);
+
+        geometry_msgs::Vector3 target_marker;
+        target_marker.x = 2;
+        target_marker.y = 2;
+        target_marker.z = 1;
+        if(!reached)
+        {
+            markerPosePosControl(marker_pose, target_marker, step_time, 0.1, reached, param);
+        }
+            
+
+        // tf2::Vector3 center_(0.7, 0, 0.7);
+        // geometry_msgs::Vector3 center = tf2::toMsg(center_);
+
+        // tf2::Quaternion quat_(0, 1/sqrt(2), 0, 1/sqrt(2)); // rotate 90 degree around world_Y
+        // // tf2::Quaternion quat_(0, 0, 0, 1); // translate origin only
+        // quat_.normalize();
+        // geometry_msgs::Quaternion center_frame_quat = tf2::toMsg(quat_);
+        
+        // double omega = 0.1;
+        // double desired_angle = 0.5*M_PI;
+        // std::string axis=argv[1];
 
         // markerPoseAngularVelControl(marker_pose, center,
         //                             step_time, omega, argv[1], param);
-        if (is_rotated)
-        {
-            // use radian instead of degree
-            markerPoseAngularPosControl(
-                marker_pose, center, center_frame_quat, 
-                step_time, omega, axis, desired_angle, is_rotated, param);
-        }
+
+        // if (is_rotated)
+        // {
+        //     // use radian instead of degree
+        //     markerPoseAngularPosControl(
+        //         marker_pose, center, center_frame_quat, 
+        //         step_time, omega, axis, desired_angle, is_rotated, param);
+        // }
         ros::spinOnce();
         loop_rate.sleep();
     }
