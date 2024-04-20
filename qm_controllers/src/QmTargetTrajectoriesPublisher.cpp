@@ -35,7 +35,7 @@ visualization_msgs::InteractiveMarker QmTargetTrajectoriesInteractiveMarker::cre
     // interactiveMarker.pose.position.z = 1.07;
     interactiveMarker.pose.position.z = 0.707;
     
-    tf2::Quaternion quat_(0, 1/sqrt(0.5), 0, 1/sqrt(0.5));
+    tf2::Quaternion quat_(0, 1/sqrt(2), 0, 1/sqrt(2));
     quat_=quat_.normalize();
     interactiveMarker.pose.orientation.x = quat_.x();
     interactiveMarker.pose.orientation.y = quat_.y();

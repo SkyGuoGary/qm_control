@@ -64,12 +64,10 @@
 
 - TODO:
   
-  - solve gimbal lock by modify rotate method (now: RPY)
-  
-  - 
+  - thoroughly resolve gimbal lock problem by modifying rotate method (now: RPY)
 
 ### /gait_mode_cmd
 
-- use simple_gait.info with only **stance** and **trot** gait
+- use simple_gait.info with only **stance** , **trot** , **standing_trot** gait
 
 

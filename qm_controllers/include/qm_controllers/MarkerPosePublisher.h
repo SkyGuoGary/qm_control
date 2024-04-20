@@ -37,7 +37,7 @@ geometry_msgs::Twist marker_vel;
 double pose_x_vel = 0, pose_y_vel = 0, pose_z_vel = 0;
 visualization_msgs::InteractiveMarkerFeedback initial_pose;
 visualization_msgs::InteractiveMarkerFeedback marker_pose;
-bool received_curr = 0;
+bool received_curr_marker = 0;
 
 void eeStateCallback(const qm_msgs::ee_state::ConstPtr &obs)
 {
@@ -50,7 +50,7 @@ void eeStateCallback(const qm_msgs::ee_state::ConstPtr &obs)
     initial_pose.pose.orientation.z = obs->state[5];
     initial_pose.pose.orientation.w = obs->state[6];
 
-    received_curr = 1;
+    received_curr_marker = 1;
 }
 void markerVelCallback(const geometry_msgs::Twist::ConstPtr &msg)
 {
@@ -82,7 +82,7 @@ void markerPoseVelControl(
     curr.pose.position.z += v_z * step_time;
     marker_pose_pub.publish(curr);
 }
-
+// set linear_vel in linear_move
 geometry_msgs::Vector3 setLinearVel(double dx, double dy, double dz, double max_v)
 {
     geometry_msgs::Vector3 linear_v;
@@ -144,7 +144,6 @@ tf2::Vector3 translationRotate(const visualization_msgs::InteractiveMarkerFeedba
     double y = relative_position.pose.position.y;
     double z = relative_position.pose.position.z;
 
-    // update translation part
     if (rotation_axis == "x")
     {
         double new_y = y * cos(step_angle) - z * sin(step_angle);
@@ -279,7 +278,12 @@ tf2::Transform poseRotate(const visualization_msgs::InteractiveMarkerFeedback cu
     return tf_of_new_inW;
 }
 
-// angular velocity control, won't stop, with center_frame_quat
+/**@brief angular velocity control with center frame quaternion
+ * @note won't stop; if occur gimbal problem, try to change Y-axis of center frame
+ * @param center_point the origin of rotation center frame
+ * @param center_frame_quat the quaternion of rotation center frame
+ * @param rotation_axis axis of rotation center frame
+ * @param angular_velocity (rad/s)*/
 void markerPoseAngularVelControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,
@@ -315,7 +319,11 @@ void markerPoseAngularVelControl(
     marker_pose_pub.publish(curr);
 }
 
-// angular velocity control, won't stop, WITHOUT center_frame rotation
+/**@brief angular velocity control without center frame quaternion
+ * @note won't stop; if occur gimbal problem, try to change Y-axis of center frame
+ * @param center_point the origin of rotation center frame
+ * @param rotation_axis axis of rotation center frame
+ * @param angular_velocity (rad/s)*/
 void markerPoseAngularVelControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,
@@ -356,7 +364,13 @@ void markerPoseAngularVelControl(
     marker_pose_pub.publish(curr);
 }
 
-// angular position control, with center_frame_quat
+/**@brief angular position control with center frame quaternion
+ * @note will stop if reach target angle, then set is_rotated=0;
+ * @note if occur gimbal problem, try to change Y-axis of center frame
+ * @param center_point the origin of rotation center frame
+ * @param rotation_axis axis of rotation center frame
+ * @param delta_angle (radian)
+ * @param angular_velocity (rad/s)*/
 void markerPoseAngularPosControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,
@@ -403,7 +417,12 @@ void markerPoseAngularPosControl(
     marker_pose_pub.publish(curr);
 }
 
-// angular position control, WITHOUT center_frame rotation
+/**@brief angular position control without center frame quaternion
+ * @note will stop if reach target angle, then set is_rotated=0
+ * @note if occur gimbal problem, try to change Y-axis of center frame
+ * @param center_point the origin of rotation center frame
+ * @param delta_angle (radian)
+ * @param angular_velocity (rad/s)*/
 void markerPoseAngularPosControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,

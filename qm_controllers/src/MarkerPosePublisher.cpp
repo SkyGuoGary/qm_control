@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     marker_vel_sub = nh.subscribe<geometry_msgs::Twist>("/marker_cmd_vel", 1, markerVelCallback);
 
     // waiting for initial ee pose
-    while (!received_curr && ros::ok() && ros::master::check())
+    while (!received_curr_marker && ros::ok() && ros::master::check())
     {
         ros::spinOnce();
         loop_rate.sleep();
