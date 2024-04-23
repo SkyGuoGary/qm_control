@@ -16,7 +16,7 @@
   qm_description/urdf/manipulator/common/kinova_common.xacro
   ```
 
-- open grasp_fix_plugin in line 55 of:
+- open grasp_fix_plugin in line 155 of:
   
   ```
   qm_control/qm_description/urdf/manipulator/j2n6s300fix.xacro

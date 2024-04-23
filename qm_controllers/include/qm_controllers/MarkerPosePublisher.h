@@ -100,14 +100,12 @@ geometry_msgs::Vector3 setLinearVel(double dx, double dy, double dz, double max_
 void markerPosePosControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 target,
-    double step_time, double max_vel, bool &reached, int order = 0)
+    double step_time, double max_vel, int order = 0)
 {
-
     double x = curr.pose.position.x, y = curr.pose.position.y, z = curr.pose.position.z;
     double dx = target.x - x, dy = target.y - y, dz = target.z - z;
     if (fabs(dx) < 0.005 && fabs(dy) < 0.005 && fabs(dz) < 0.005)
     {
-        reached = 1;
         ROS_INFO("Reached target");
         return;
     }
@@ -283,7 +281,7 @@ tf2::Transform poseRotate(const visualization_msgs::InteractiveMarkerFeedback cu
  * @param center_point the origin of rotation center frame
  * @param center_frame_quat the quaternion of rotation center frame
  * @param rotation_axis axis of rotation center frame
- * @param angular_velocity (rad/s)*/
+ * @param angular_velocity right-hand rule (rad/s)*/
 void markerPoseAngularVelControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,
@@ -323,7 +321,7 @@ void markerPoseAngularVelControl(
  * @note won't stop; if occur gimbal problem, try to change Y-axis of center frame
  * @param center_point the origin of rotation center frame
  * @param rotation_axis axis of rotation center frame
- * @param angular_velocity (rad/s)*/
+ * @param angular_velocity right-hand rule (rad/s)*/
 void markerPoseAngularVelControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,
@@ -369,28 +367,29 @@ void markerPoseAngularVelControl(
  * @note if occur gimbal problem, try to change Y-axis of center frame
  * @param center_point the origin of rotation center frame
  * @param rotation_axis axis of rotation center frame
- * @param delta_angle (radian)
- * @param angular_velocity (rad/s)*/
-void markerPoseAngularPosControl(
+ * @param delta_angle right-hand rule (radian)
+ * @param angular_velocity right-hand rule (rad/s)
+ * @return if finished, return 1*/
+bool markerPoseAngularPosControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,
     const geometry_msgs::Quaternion center_frame_quat,
     const double step_time, const double angular_velocity, const std::string rotation_axis,
-    const double delta_angle, bool &is_rotated, bool rotate_orientation = 1)
+    const double delta_angle, bool rotate_orientation = 1)
 {
     // rotation angle increment in every step
     double step_angle = angular_velocity * step_time;
+    bool finished=0;
 
     // check if marker has reached target angle
     static double accumulated_angle = 0;
     accumulated_angle += step_angle;
-    if (accumulated_angle >= delta_angle)
+    if (fabs(accumulated_angle) > fabs(delta_angle))
     {
         step_angle = delta_angle - (accumulated_angle - step_angle);
-        is_rotated = 0;
-        accumulated_angle = 0;
+        finished=1;
     }
-    std::cout << "acc_angle: " << accumulated_angle << std::endl;
+    std::cout << "acc_angle: " << step_angle << std::endl;
 
     tf2::Vector3 res_translation;
     tf2::Quaternion res_quat;
@@ -415,14 +414,20 @@ void markerPoseAngularPosControl(
     curr.pose.position.z = res_translation.z();
 
     marker_pose_pub.publish(curr);
+    if(finished)
+    {
+        accumulated_angle=0;
+        return finished;
+    }
+    return 0;
 }
 
 /**@brief angular position control without center frame quaternion
  * @note will stop if reach target angle, then set is_rotated=0
  * @note if occur gimbal problem, try to change Y-axis of center frame
  * @param center_point the origin of rotation center frame
- * @param delta_angle (radian)
- * @param angular_velocity (rad/s)*/
+ * @param delta_angle right-hand rule (radian)
+ * @param angular_velocity right-hand rule (rad/s)*/
 void markerPoseAngularPosControl(
     visualization_msgs::InteractiveMarkerFeedback &curr,
     const geometry_msgs::Vector3 center_point,

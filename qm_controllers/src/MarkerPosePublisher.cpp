@@ -15,8 +15,6 @@
 using namespace ocs2;
 using namespace qm;
 using namespace legged_robot;
-bool is_rotated = 1;
-bool reached = 0;
 
 int main(int argc, char **argv)
 {
@@ -65,10 +63,8 @@ int main(int argc, char **argv)
         target_marker.x = 2;
         target_marker.y = 2;
         target_marker.z = 1;
-        if(!reached)
-        {
-            markerPosePosControl(marker_pose, target_marker, step_time, 0.1, reached, param);
-        }
+        markerPosePosControl(marker_pose, target_marker, step_time, 0.1, param);
+        
             
 
         // tf2::Vector3 center_(0.7, 0, 0.7);

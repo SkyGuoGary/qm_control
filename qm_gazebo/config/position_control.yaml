@@ -62,7 +62,7 @@ joint_5_position_controller:
   pid:
     d: 0.2 # 5.0
     i: 0
-    p: 2000 # 500
+    p: 500 # 500
   type: effort_controllers/JointPositionController
 joint_6_position_controller:
   joint: j2n6s300_joint_6

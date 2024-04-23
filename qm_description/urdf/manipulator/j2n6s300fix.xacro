@@ -160,9 +160,6 @@
                 <gripper_link> j2n6s300_link_finger_1 </gripper_link>
                 <gripper_link> j2n6s300_link_finger_2 </gripper_link>
                 <gripper_link> j2n6s300_link_finger_3 </gripper_link>
-                <!-- <gripper_link> j2n6s300_link_finger_tip_1 </gripper_link>
-                <gripper_link> j2n6s300_link_finger_tip_2 </gripper_link>
-                <gripper_link> j2n6s300_link_finger_tip_3 </gripper_link> -->
             </arm>
             <forces_angle_tolerance>100</forces_angle_tolerance>
             <update_rate>4</update_rate>

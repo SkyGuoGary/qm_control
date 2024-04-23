@@ -21,41 +21,27 @@ double step_time = 1.0 / freq;
 ros::Publisher fingers[3];
 ros::Publisher gait_pub;
 // grasp action
-bool grasped = 0, ungrasped = 1;
-bool reached = 0, is_rotated = 1;
+std_msgs::Float64 fingers_val[3];
 
-void grasp_door_handle(bool ungrasp = 0)
+void grasp_door_handle(double finger1, double finger2, bool ungrasp = 0)
 {
-    std_msgs::Float64 fingers_val[3];
     // ungrasp
     if (ungrasp)
     {
         for (int i = 0; i < 3; i++)
         {
             fingers_val[i].data = 0;
-            if (!ungrasped)
-            {
-                std::cout << "Command: ungrasp handle" << std::endl;
-                ungrasped = 1;
-                grasped = 0;
-            }
             fingers[i].publish(fingers_val[i]);
         }
         return;
     }
 
     // grasp
-    fingers_val[0].data = 1.2;
-    fingers_val[1].data = 1.22;
+    fingers_val[0].data += 0.02;
+    if(fingers_val[0].data>=finger1)    fingers_val[0].data=finger1;
+    fingers_val[1].data += 0.02;
+    if(fingers_val[1].data>=finger2)    fingers_val[1].data=finger2;
     fingers_val[2].data = 0;
-    if (!grasped)
-    {
-        std::cout << "Command: start grasping" << std::endl;
-        printf("finger 1~3: %lf,%lf,%lf",
-               fingers_val[0].data, fingers_val[1].data, fingers_val[2].data);
-        grasped = 1;
-        ungrasped = 0;
-    }
     for (int i = 0; i < 3; i++)
     {
         fingers[i].publish(fingers_val[i]);
@@ -88,25 +74,20 @@ geometry_msgs::Transform set_grasping_pose()
     return grasping_pose;
 }
 // move to grasping point
-void move_to_grasp(double v_max = 0.15)
+void move_to(geometry_msgs::Transform target_pose, double v_max = 0.15)
 {
-    geometry_msgs::Transform target_pose = set_grasping_pose();
-
     geometry_msgs::Vector3 target_position;
     target_position.x = target_pose.translation.x;
     target_position.y = target_pose.translation.y;
     target_position.z = target_pose.translation.z;
 
     marker_pose.pose.orientation = target_pose.rotation;
-    if (!reached)
-    {
-        markerPosePosControl(marker_pose, target_position, step_time, v_max, reached, 1);
-    }
+    markerPosePosControl(marker_pose, target_position, step_time, v_max, 1);
 }
 // subscribe handle frame for rotation
 geometry_msgs::Transform set_handle_frame()
 {
-    tf2::Vector3 handle_point_(2.99, 0.225, 1.068);
+    tf2::Vector3 handle_point_(3.0465, 0.2922, 1.068);
     geometry_msgs::Vector3 handle_point = tf2::toMsg(handle_point_);
 
     tf2::Quaternion handle_quat_(0, 1 / sqrt(2), 0, 1 / sqrt(2)); // rotate 90 degree around world_Y
@@ -119,15 +100,13 @@ geometry_msgs::Transform set_handle_frame()
     return handle_frame;
 }
 // rotate handle, angle:radian, omega:rad/s
-void rotate_handle(double angle, double omega=0.2)
+bool rotate_handle(double angle, double omega = 0.2)
 {
-    geometry_msgs::Transform handle_frame=set_handle_frame();
-    if (is_rotated)
-    {
-        markerPoseAngularPosControl(
-            marker_pose, handle_frame.translation, handle_frame.rotation,
-            step_time, omega, "z", angle, is_rotated);
-    }
+    geometry_msgs::Transform handle_frame = set_handle_frame();
+    bool finished = markerPoseAngularPosControl(
+        marker_pose, handle_frame.translation, handle_frame.rotation,
+        step_time, omega, "z", angle);
+    return finished;
 }
 // stage 3: ungrasp handle and push door to a specific angle
 
@@ -141,7 +120,8 @@ int main(int argc, char **argv)
     if (argc < 2)
     {
         std::cout << "Usage:" << std::endl
-                  << "1:grasp;  0:ungrasp;  2:standing_trot;  3:move to door;  4:stance";
+                  << "1:grasp;  0:ungrasp;  2:standing_trot;  3:move to door;  4:stance; "
+                  << "5:rotate handle; 6:rotate back; 7:push position";
         return 1;
     }
     int stage = std::stoi(argv[1]);
@@ -184,7 +164,7 @@ int main(int argc, char **argv)
         // stage 5: ungrasp and reach the final target
         if (stage == 1 || stage == 0)
         {
-            grasp_door_handle(!stage);
+            grasp_door_handle( 1.2, 1.22, !stage);
         }
         if (stage == 2)
         {
@@ -192,7 +172,7 @@ int main(int argc, char **argv)
         }
         if (stage == 3)
         {
-            move_to_grasp();
+            move_to(set_grasping_pose());
         }
         if (stage == 4)
         {
@@ -201,7 +181,29 @@ int main(int argc, char **argv)
         if (stage == 5)
         {
             double rotate_angle = 45 * M_PI / 180.0;
-            rotate_handle(rotate_angle);
+            bool finish=rotate_handle(rotate_angle);
+            if(finish)  break;
+        }
+        if (stage == 6)
+        {
+            double rotate_angle = -45 * M_PI / 180.0;
+            bool finish=rotate_handle(rotate_angle, -0.2);
+            if(finish)  break;
+        }
+        if (stage == 7)
+        {
+            geometry_msgs::Transform back_target = set_grasping_pose();
+            back_target.translation.x -= 0.3;
+            back_target.translation.z = 0.707;
+            move_to(back_target, 0.05);
+        }
+        
+        if (stage == 8)
+        {
+            geometry_msgs::Transform final_target = set_grasping_pose();
+            final_target.translation.x += 3;
+            final_target.translation.z = 0.707;
+            move_to(final_target,0.25);
         }
         ros::spinOnce();
         loop_rate.sleep();

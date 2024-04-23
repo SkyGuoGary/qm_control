@@ -312,7 +312,7 @@
           </limit>
           <dynamics>
             <damping>0.1</damping>
-            <spring_stiffness>0.1</spring_stiffness>
+            <spring_stiffness>1</spring_stiffness>
             <spring_reference>0</spring_reference>
           </dynamics>
         </axis>
@@ -390,19 +390,19 @@
         <scale>1 1 1</scale>
         <link name='door'>
           <pose>3.04651 -0.507827 2.03999 3.14159 2e-06 1.57744</pose>
-          <velocity>-0.000645 -1e-06 -1.6e-05 1e-06 -0.000125 -8e-06</velocity>
+          <velocity>0 0 0 0 0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='frame'>
           <pose>3.10651 -0.508319 2e-06 1e-06 -0 0</pose>
-          <velocity>-1.5e-05 0 -1e-06 -1e-06 -0.000242 1.1e-05</velocity>
+          <velocity>0 0 0 0 0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='handles'>
           <pose>3.04056 0.292149 1.04999 -3.14159 0.001591 -1.56415</pose>
-          <velocity>-0.000119 3e-06 -4e-06 1e-06 -0.000122 -1.3e-05</velocity>
+          <velocity>0 0 0 0 0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
