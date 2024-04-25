@@ -1,3 +1,6 @@
+# This yaml is for ee pose stability while gait=stance
+# The ee might perform worse than another yaml in other gaits
+
 # Publish all joint states -----------------------------------
 joint_state_controller:
   type: joint_state_controller/JointStateController
@@ -41,14 +44,14 @@ joint_2_position_controller:
   pid:
     d: 8.0
     i: 0
-    p: 5000
+    p: 50000
   type: effort_controllers/JointPositionController
 joint_3_position_controller:
   joint: j2n6s300_joint_3
   pid:
     d: 8.0
     i: 0
-    p: 5000
+    p: 15000
   type: effort_controllers/JointPositionController
 joint_4_position_controller:
   joint: j2n6s300_joint_4
@@ -72,5 +75,4 @@ joint_6_position_controller:
     p: 500
   type: effort_controllers/JointPositionController
 
-  # -----------------------velocity control--------------------------
   
