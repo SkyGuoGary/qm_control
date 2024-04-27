@@ -120,3 +120,28 @@ bool rotate_handle(double angle, double omega = 0.2)
         step_time, omega, "z", angle);
     return finished;
 }
+
+geometry_msgs::Transform set_hinge_frame()
+{
+    tf2::Vector3 handle_point_(3.05, -0.3, 1);
+    geometry_msgs::Vector3 handle_point = tf2::toMsg(handle_point_);
+
+    tf2::Quaternion handle_quat_(0, 0, 0, 1);
+    handle_quat_ = handle_quat_.normalize();
+    geometry_msgs::Quaternion handle_quat = tf2::toMsg(handle_quat_);
+
+    geometry_msgs::Transform handle_frame;
+    handle_frame.translation = handle_point;
+    handle_frame.rotation = handle_quat;
+    return handle_frame;
+}
+
+// rotate hinge, angle:radian, omega:rad/s
+bool rotate_hinge(double angle, double omega = 0.1)
+{
+    geometry_msgs::Transform hinge_frame = set_hinge_frame();
+    bool finished = markerPoseAngularPosControl(
+        marker_pose, hinge_frame.translation, hinge_frame.rotation,
+        step_time, omega, "z", angle);
+    return finished;
+}

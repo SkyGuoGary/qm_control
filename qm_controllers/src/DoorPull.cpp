@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     {
         std::cout << "Usage:" << std::endl
                   << "1:grasp;  0:ungrasp;  2:standing_trot;  3:move to door;  4:stance; "
-                  << "5:rotate handle; 6:rotate back; 7:push position; 8: final target";
+                  << "5:rotate handle; 6:rotate back; 7: pull door; 8: move base";
         return 1;
     }
     int stage = std::stoi(argv[1]);
@@ -64,6 +64,7 @@ int main(int argc, char **argv)
         if (stage == 2)
         {
             switch_gait_pub(gaitCommand, "standing_trot");
+            break;
         }
         if (stage == 3)
         {
@@ -72,6 +73,7 @@ int main(int argc, char **argv)
         if (stage == 4)
         {
             switch_gait_pub(gaitCommand, "stance");
+            break;
         }
         if (stage == 5)
         {
@@ -89,18 +91,15 @@ int main(int argc, char **argv)
         }
         if (stage == 7)
         {
-            geometry_msgs::Transform back_target = set_grasping_pose();
-            back_target.translation.x -= 0.3;
-            back_target.translation.z = 0.707;
-            move_to(back_target, 0.05);
+            double rotate_angle = 30 * M_PI / 180.0;
+            bool finish = rotate_hinge(rotate_angle);
+            if (finish)
+                break;
         }
 
         if (stage == 8)
         {
-            geometry_msgs::Transform final_target = set_grasping_pose();
-            final_target.translation.x += 3;
-            final_target.translation.z = 0.707;
-            move_to(final_target, 0.25);
+            
         }
         ros::spinOnce();
         loop_rate.sleep();

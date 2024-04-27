@@ -91,7 +91,7 @@ geometry_msgs::Vector3 setLinearVel(double dx, double dy, double dz, double max_
     linear_v.x = dx * k;
     linear_v.y = dy * k;
     linear_v.z = dz * k;
-    std::cout<<linear_v;
+    // std::cout<<linear_v;
     return linear_v;
 }
 /**@brief position control

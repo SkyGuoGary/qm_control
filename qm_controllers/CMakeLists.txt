@@ -109,6 +109,11 @@ target_link_libraries(door_push ${catkin_LIBRARIES})
 add_dependencies(door_push
         ${catkin_EXPORTED_TARGETS}
         )
+add_executable(door_pull src/DoorPull.cpp)
+target_link_libraries(door_pull ${catkin_LIBRARIES})
+add_dependencies(door_pull
+        ${catkin_EXPORTED_TARGETS}
+        )
 
 
 
