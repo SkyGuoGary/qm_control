@@ -123,7 +123,7 @@ bool rotate_handle(double angle, double omega = 0.2)
 
 geometry_msgs::Transform set_hinge_frame()
 {
-    tf2::Vector3 handle_point_(3.05, -0.3, 1);
+    tf2::Vector3 handle_point_(3.06, -0.5, 1);
     geometry_msgs::Vector3 handle_point = tf2::toMsg(handle_point_);
 
     tf2::Quaternion handle_quat_(0, 0, 0, 1);

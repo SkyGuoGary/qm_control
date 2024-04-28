@@ -28,6 +28,6 @@
 - 待其他步骤完成后，启用**推门规划**或**拉门规划**：
   
   ```
-  rosrun qm_controllers push_door 3
-  rosrun qm_controllers pull_door 3
+  rosrun qm_controllers door_push 3
+  rosrun qm_controllers door_pull 3
   ```
