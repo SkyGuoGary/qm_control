@@ -180,6 +180,7 @@ TargetTrajectories EEgoalPoseToTargetTrajectories(const Eigen::Vector3d& positio
         target(0) = position(0) - 0.52;
         target(1) = position(1) - 0.09;
         target(2) = COM_HEIGHT;
+        target(3) = 0;
         target(4) = 0;
         target(5) = 0;
         return target;
