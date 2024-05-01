@@ -11,41 +11,43 @@
 using namespace ocs2;
 using namespace qm;
 
-namespace {
+namespace
+{
     scalar_t TARGET_DISPLACEMENT_VELOCITY; // ee
-    scalar_t TARGET_ROTATION_VELOCITY; // ee
+    scalar_t TARGET_ROTATION_VELOCITY;     // ee
     scalar_t COM_HEIGHT;
-    vector_t DEFAULT_JOINT_STATE(18); //18
+    vector_t DEFAULT_JOINT_STATE(18); // 18
     scalar_t TIME_TO_TARGET;
-}  // namespace
+} // namespace
 
 /**
  * calculate arrive time
  */
-scalar_t estimateTimeToTarget(const vector_t& desiredBaseDisplacement) {
+scalar_t estimateTimeToTarget(const vector_t &desiredBaseDisplacement)
+{
     // displacement
-    const scalar_t& dx = desiredBaseDisplacement(0);
-    const scalar_t& dy = desiredBaseDisplacement(1);
-    const scalar_t& dz = desiredBaseDisplacement(2);
+    const scalar_t &dx = desiredBaseDisplacement(0);
+    const scalar_t &dy = desiredBaseDisplacement(1);
+    const scalar_t &dz = desiredBaseDisplacement(2);
     const scalar_t displacement = std::sqrt(dx * dx + dy * dy + dz * dz);
     const scalar_t displacementTime = displacement / TARGET_DISPLACEMENT_VELOCITY;
 
     // rotation
-    const scalar_t& dyaw = desiredBaseDisplacement(3);
-    const scalar_t& droll = desiredBaseDisplacement(4);
-    const scalar_t& dpitch = desiredBaseDisplacement(5);
+    const scalar_t &dyaw = desiredBaseDisplacement(3);
+    const scalar_t &droll = desiredBaseDisplacement(4);
+    const scalar_t &dpitch = desiredBaseDisplacement(5);
     const scalar_t ratation = std::sqrt(dyaw * dyaw + droll * droll + dpitch * dpitch);
     const scalar_t rotationTime = ratation / TARGET_ROTATION_VELOCITY;
 
     return std::max(rotationTime, displacementTime);
 }
 
-
-TargetTrajectories targetPoseToTargetTrajectories(const vector_t& EeTargetPose,
-                                                  const vector_t& BaseTargetPose,
-                                                  const SystemObservation& observation,
-                                                  const SystemObservation& eeState,
-                                                  const scalar_t& targetReachingTime) {
+TargetTrajectories targetPoseToTargetTrajectories(const vector_t &EeTargetPose,
+                                                  const vector_t &BaseTargetPose,
+                                                  const SystemObservation &observation,
+                                                  const SystemObservation &eeState,
+                                                  const scalar_t &targetReachingTime)
+{
     // desired time trajectory
     const scalar_array_t timeTrajectory{observation.time, targetReachingTime};
 
@@ -70,17 +72,18 @@ TargetTrajectories targetPoseToTargetTrajectories(const vector_t& EeTargetPose,
 /**
  * publish dog traj.
  */
-TargetTrajectories cmdVelToTargetTrajectories(const vector_t& cmdVel,
-                                              vector_t& lastEeTarget,
-                                              const SystemObservation& observation,
-                                              const SystemObservation& eeState)
+TargetTrajectories cmdVelToTargetTrajectories(const vector_t &cmdVel,
+                                              vector_t &lastEeTarget,
+                                              const SystemObservation &observation,
+                                              const SystemObservation &eeState)
 {
     const vector_t BaseCurrenPose = observation.state.segment<6>(6);
     const Eigen::Matrix<scalar_t, 3, 1> zyx = BaseCurrenPose.tail(3);
     vector_t cmdVelRot = getRotationMatrixFromZyxEulerAngles(zyx) * cmdVel.head(3); // world frame
 
     const scalar_t timeToTarget = TIME_TO_TARGET;
-    const vector_t BaseTargetPose = [&]() {
+    const vector_t BaseTargetPose = [&]()
+    {
         vector_t target(6);
         target(0) = BaseCurrenPose(0) + cmdVelRot(0) * timeToTarget;
         target(1) = BaseCurrenPose(1) + cmdVelRot(1) * timeToTarget;
@@ -91,8 +94,9 @@ TargetTrajectories cmdVelToTargetTrajectories(const vector_t& cmdVel,
         return target;
     }();
 
-    const vector_t EeTargetPose = [&]() {
-        if((lastEeTarget.head(3) - eeState.state.head(3)).norm() > 0.1)
+    const vector_t EeTargetPose = [&]()
+    {
+        if ((lastEeTarget.head(3) - eeState.state.head(3)).norm() > 0.1)
             lastEeTarget.head(3) = eeState.state.head(3);
 
         vector_t target(7);
@@ -115,10 +119,11 @@ TargetTrajectories cmdVelToTargetTrajectories(const vector_t& cmdVel,
 /**
  * publish ee traj.
  */
-TargetTrajectories EeCmdVelToTargetTrajectories(const vector_t& cmdVel,
-                                                vector_t& lastEeTarget,
-                                                const SystemObservation& observation,
-                                                const SystemObservation& eeState) {
+TargetTrajectories EeCmdVelToTargetTrajectories(const vector_t &cmdVel,
+                                                vector_t &lastEeTarget,
+                                                const SystemObservation &observation,
+                                                const SystemObservation &eeState)
+{
     // current pose
     const vector_t EeCurrentPose = eeState.state;
     const vector_t BaseCurrenPose = observation.state.segment<6>(6);
@@ -127,7 +132,8 @@ TargetTrajectories EeCmdVelToTargetTrajectories(const vector_t& cmdVel,
     vector_t cmdVelRot = quat.toRotationMatrix() * quat_init.toRotationMatrix().transpose() * cmdVel.head(3); // world frame
 
     const scalar_t timeToTarget = TIME_TO_TARGET;
-    const vector_t EeTargetPose =  [&](){
+    const vector_t EeTargetPose = [&]()
+    {
         vector_t target(7);
         target = EeCurrentPose;
         target(0) = EeCurrentPose(0) + cmdVelRot(0) * timeToTarget;
@@ -142,7 +148,8 @@ TargetTrajectories EeCmdVelToTargetTrajectories(const vector_t& cmdVel,
         return target;
     }();
 
-    const vector_t BaseTargetPose = [&](){
+    const vector_t BaseTargetPose = [&]()
+    {
         vector_t target(6);
         target = BaseCurrenPose;
         target(0) = EeTargetPose(0) - 0.52;
@@ -159,35 +166,46 @@ TargetTrajectories EeCmdVelToTargetTrajectories(const vector_t& cmdVel,
     return targetPoseToTargetTrajectories(EeTargetPose, BaseTargetPose, observation, eeState, targetReachingTime);
 }
 
-
-
 /**
  * Converts the pose of the interactive marker to TargetTrajectories.
  */
-TargetTrajectories EEgoalPoseToTargetTrajectories(const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation,
-                                                  const SystemObservation& observation, const SystemObservation& eeState) {
+TargetTrajectories EEgoalPoseToTargetTrajectories(const Eigen::Vector3d &position, const Eigen::Quaterniond &orientation,
+                                                  const SystemObservation &observation, const SystemObservation &eeState)
+{
 
     // current pose
     const vector_t EeCurrentPose = eeState.state;
     const vector_t BaseCurrenPose = observation.state.segment<6>(6);
     // target pose
     const vector_t EeTargetPose = (vector_t(7) << position, orientation.coeffs()).finished();
+    // get yaw
+    Eigen::Vector3d eulerAngle = orientation.matrix().eulerAngles(0, 1, 2);
+    // std::cout<<eulerAngle<<std::endl<<std::endl;
+    double yaw = eulerAngle(1) - 0.5*M_PI;
 
-    const vector_t BaseTargetPose = [&](){
+    // std::cout<<yaw<<std::endl<<std::endl;
+
+    const vector_t BaseTargetPose = [&]()
+    {
         vector_t target(6);
         target.setZero();
         target = BaseCurrenPose;
-        target(0) = position(0) - 0.52;
-        target(1) = position(1) - 0.09;
+        double delta_x = 0.52, delta_y = 0.09; // set delta_y bigger?
+        double dx = delta_x * cos(yaw) - delta_y * sin(yaw);
+        double dy = delta_x * sin(yaw) + delta_y * cos(yaw);
+
+        target(0) = position(0) - dx;
+        target(1) = position(1) - dy;
         target(2) = COM_HEIGHT;
-        target(3) = 0;
+        target(3) = yaw;
         target(4) = 0;
         target(5) = 0;
         return target;
     }();
 
     // time
-    const vector_t deltaError = [&](){
+    const vector_t deltaError = [&]()
+    {
         vector_t delta(6);
         delta.segment<3>(0) = EeTargetPose.segment<3>(0) - EeCurrentPose.segment<3>(0);
 
@@ -204,7 +222,8 @@ TargetTrajectories EEgoalPoseToTargetTrajectories(const Eigen::Vector3d& positio
     return targetPoseToTargetTrajectories(EeTargetPose, BaseTargetPose, observation, eeState, targetReachingTime);
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     const std::string robotName = "qm";
     const std::string gaitName = "legged_robot";
 

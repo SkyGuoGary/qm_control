@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     {
         if (stage == 1 || stage == 0)
         {
-            grasp_door_handle(1.2, 1.22, !stage);
+            grasp_door_handle(1.21, 1.22, !stage);
         }
         if (stage == 2)
         {
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
         }
         if (stage == 3)
         {
-            move_to(set_grasping_pose());
+            move_to(set_grasping_pose(1));
         }
         if (stage == 4)
         {
@@ -78,21 +78,21 @@ int main(int argc, char **argv)
         if (stage == 5)
         {
             double rotate_angle = 45 * M_PI / 180.0;
-            bool finish = rotate_handle(rotate_angle);
+            bool finish = rotate_handle(rotate_angle, 0.2, 1);
             if (finish)
                 break;
         }
         if (stage == 6)
         {
             double rotate_angle = -45 * M_PI / 180.0;
-            bool finish = rotate_handle(rotate_angle, -0.2);
+            bool finish = rotate_handle(rotate_angle, -0.2, 1);
             if (finish)
                 break;
         }
         if (stage == 7)
         {
             double rotate_angle = 30 * M_PI / 180.0;
-            bool finish = rotate_hinge(rotate_angle);
+            bool finish = rotate_hinge(rotate_angle,0.1,1);
             if (finish)
                 break;
         }

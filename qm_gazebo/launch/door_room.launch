@@ -1,5 +1,5 @@
 <launch>
-    <arg name="world" default="pull_door"/>
+    <arg name="world" default="pull_door_2"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
       <arg name="world_name" value="$(find qm_gazebo)/worlds/$(arg world).world"/>

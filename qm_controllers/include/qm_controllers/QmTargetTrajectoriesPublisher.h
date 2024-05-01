@@ -73,40 +73,40 @@ namespace qm
             };
             eePoseSub_ = nh.subscribe<qm_msgs::ee_state>(topicPrefix + "_mpc_observation_ee_state", 1, eePoseCallback);
 
-            // // ee cmd vel subscriber
-            // auto eeCmdVelCallback = [this](const geometry_msgs::Twist::ConstPtr& msg) {
-            //     if (latestObservation_.time == 0.0) {
-            //         return;
-            //     }
+            // ee cmd vel subscriber
+            auto eeCmdVelCallback = [this](const geometry_msgs::Twist::ConstPtr& msg) {
+                if (latestObservation_.time == 0.0) {
+                    return;
+                }
 
-            //     vector_t cmdVel = vector_t::Zero(3);
-            //     cmdVel[0] = msg->linear.x;
-            //     cmdVel[1] = msg->linear.y;
-            //     cmdVel[2] = msg->linear.z;
+                vector_t cmdVel = vector_t::Zero(3);
+                cmdVel[0] = msg->linear.x;
+                cmdVel[1] = msg->linear.y;
+                cmdVel[2] = msg->linear.z;
 
-            //     const auto trajectories = eeCmdVelToTargetTrajectories_(cmdVel, lastEeTarget_,
-            //                                               latestObservation_, latestObservationEe_);
-            //     targetTrajectoriesPublisher_->publishTargetTrajectories(trajectories);
-            // };
-            // eeCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/ee_cmd_vel", 1, eeCmdVelCallback);
+                const auto trajectories = eeCmdVelToTargetTrajectories_(cmdVel, lastEeTarget_,
+                                                          latestObservation_, latestObservationEe_);
+                targetTrajectoriesPublisher_->publishTargetTrajectories(trajectories);
+            };
+            eeCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/ee_cmd_vel", 1, eeCmdVelCallback);
 
-            // // cmd_vel subscriber
-            // auto cmdVelCallback = [this](const geometry_msgs::Twist::ConstPtr& msg) {
-            //     if (latestObservation_.time == 0.0) {
-            //         return;
-            //     }
+            // cmd_vel subscriber
+            auto cmdVelCallback = [this](const geometry_msgs::Twist::ConstPtr& msg) {
+                if (latestObservation_.time == 0.0) {
+                    return;
+                }
 
-            //     vector_t cmdVel = vector_t::Zero(4);
-            //     cmdVel[0] = msg->linear.x;
-            //     cmdVel[1] = msg->linear.y;
-            //     cmdVel[2] = msg->linear.z;
-            //     cmdVel[3] = msg->angular.z;
+                vector_t cmdVel = vector_t::Zero(4);
+                cmdVel[0] = msg->linear.x;
+                cmdVel[1] = msg->linear.y;
+                cmdVel[2] = msg->linear.z;
+                cmdVel[3] = msg->angular.z;
 
-            //     const auto trajectories = cmdVelToTargetTrajectories_(cmdVel, lastEeTarget_,
-            //                                           latestObservation_, latestObservationEe_);
-            //     targetTrajectoriesPublisher_->publishTargetTrajectories(trajectories);
-            // };
-            // dogCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelCallback);
+                const auto trajectories = cmdVelToTargetTrajectories_(cmdVel, lastEeTarget_,
+                                                      latestObservation_, latestObservationEe_);
+                targetTrajectoriesPublisher_->publishTargetTrajectories(trajectories);
+            };
+            dogCmdVelSub_ = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 1, cmdVelCallback);
 
             // marker_cmd_vel subscriber
             auto markerVelCallback = [this](const visualization_msgs::InteractiveMarkerFeedback::ConstPtr &msg)
