@@ -25,7 +25,7 @@
 #include <geometry_msgs/Transform.h>
 
 ros::Publisher marker_pose_pub;
-ros::Subscriber marker_feedback_sub, marker_vel_sub;
+ros::Subscriber marker_feedback_sub, marker_vel_sub,base_state_sub;
 
 const int f = 10;
 // position delta between obs & truth
@@ -34,6 +34,8 @@ const float delta_y = -0.0015;
 const float delta_z = 0.011;
 // velocity control
 geometry_msgs::Twist marker_vel;
+ocs2_msgs::mpc_observation base_state_;
+geometry_msgs::Twist base_state;
 double pose_x_vel = 0, pose_y_vel = 0, pose_z_vel = 0;
 visualization_msgs::InteractiveMarkerFeedback initial_pose;
 visualization_msgs::InteractiveMarkerFeedback marker_pose;
@@ -55,6 +57,17 @@ void eeStateCallback(const qm_msgs::ee_state::ConstPtr &obs)
 void markerVelCallback(const geometry_msgs::Twist::ConstPtr &msg)
 {
     marker_vel = *msg;
+}
+void baseStateCallback(const ocs2_msgs::mpc_observation::ConstPtr &msg)
+{
+    base_state_ = *msg;
+    base_state.linear.x=base_state_.state.value[6];
+    base_state.linear.y=base_state_.state.value[7];
+    base_state.linear.z=base_state_.state.value[8];
+    base_state.angular.z=base_state_.state.value[9];
+    base_state.angular.y=base_state_.state.value[10];
+    base_state.angular.x=base_state_.state.value[11];
+    
 }
 
 visualization_msgs::InteractiveMarkerFeedback setInitPose()
@@ -82,9 +95,12 @@ void markerPoseVelControl(
     curr.pose.position.z += v_z * step_time;
     marker_pose_pub.publish(curr);
 }
-// set linear_vel in linear_move
+// set linear_vel in linear_move, return 3 positive vel
 geometry_msgs::Vector3 setLinearVel(double dx, double dy, double dz, double max_v)
 {
+    dx=fabs(dx);
+    dy=fabs(dy);
+    dz=fabs(dz);
     geometry_msgs::Vector3 linear_v;
     double d_max = std::max(dx, std::max(dy, dz));
     double k = max_v / d_max;
@@ -128,9 +144,22 @@ void markerPosePosControl(
             linear_vel = setLinearVel(dx, dy, dz, max_vel);
         }
     }
-    curr.pose.position.x += std::min(linear_vel.x * step_time, target.x - x);
-    curr.pose.position.y += std::min(linear_vel.y * step_time, target.y - y);
-    curr.pose.position.z += std::min(linear_vel.z * step_time, target.z - z);
+    double step_x,step_y,step_z;
+    if(dx>=0)
+        step_x=std::min(linear_vel.x * step_time, dx);
+    else
+        step_x=std::max(-linear_vel.x * step_time, dx);
+    if(dy>=0)
+        step_y=std::min(linear_vel.y * step_time, dy);
+    else
+        step_y=std::max(-linear_vel.y * step_time, dy);
+    if(dz>=0)
+        step_z=std::min(linear_vel.z * step_time, dz);
+    else
+        step_z=std::max(-linear_vel.z * step_time, dz);
+    curr.pose.position.x += step_x;
+    curr.pose.position.y += step_y;
+    curr.pose.position.z += step_z;
     marker_pose_pub.publish(curr);
 }
 

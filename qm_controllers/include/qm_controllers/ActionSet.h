@@ -73,20 +73,25 @@ void switch_gait_pub(myGaitKeyboardPublisher myGaitCommand, std::string gaitName
 geometry_msgs::Transform set_grasping_pose(int mode = 0)
 {
     geometry_msgs::Vector3 grasp_point;
+    geometry_msgs::Quaternion grasp_quat;
     if (mode == 0) // push
     {
         tf2::Vector3 grasp_point_(2.99, 0.175, 1.068);
+        // tf2::Vector3 grasp_point_(2.98, 0.28, 1.07);
         grasp_point = tf2::toMsg(grasp_point_);
+        tf2::Quaternion grasp_quat_(0, 1 / sqrt(2), 0, 1 / sqrt(2)); // rotate 90 degree around world_Y
+        // tf2::Quaternion grasp_quat_(0.5, 0.5, -0.5, 0.5);
+        grasp_quat_ = grasp_quat_.normalize();
+        grasp_quat = tf2::toMsg(grasp_quat_);
     }
     else // pull
     {
-        tf2::Vector3 grasp_point_(-3.00, 0.233, 1.068);
+        tf2::Vector3 grasp_point_(-2.9, 0.29, 1.1);
         grasp_point = tf2::toMsg(grasp_point_);
+        tf2::Quaternion grasp_quat_(-1 / sqrt(2), 0, 1 / sqrt(2), 0); // rotate -90 degree around world_Y
+        grasp_quat_ = grasp_quat_.normalize();
+        grasp_quat = tf2::toMsg(grasp_quat_);
     }
-
-    tf2::Quaternion grasp_quat_(0, 1 / sqrt(2), 0, 1 / sqrt(2)); // rotate 90 degree around world_Y
-    grasp_quat_ = grasp_quat_.normalize();
-    geometry_msgs::Quaternion grasp_quat = tf2::toMsg(grasp_quat_);
 
     geometry_msgs::Transform grasping_pose;
     grasping_pose.translation = grasp_point;
@@ -171,6 +176,22 @@ bool rotate_hinge(double angle, double omega = 0.1, int mode = 0)
     geometry_msgs::Transform hinge_frame = set_hinge_frame(mode);
     bool finished = markerPoseAngularPosControl(
         marker_pose, hinge_frame.translation, hinge_frame.rotation,
+        step_time, omega, "z", angle);
+    return finished;
+}
+
+bool rotate_base(double angle, double omega = 0.1)
+{
+    geometry_msgs::Transform base_frame;
+    base_frame.translation.x=0;
+    base_frame.translation.y=0.175;
+    base_frame.translation.z=0;
+    base_frame.rotation.x=0;
+    base_frame.rotation.y=0;
+    base_frame.rotation.z=0;
+    base_frame.rotation.w=1;
+    bool finished = markerPoseAngularPosControl(
+        marker_pose, base_frame.translation, base_frame.rotation,
         step_time, omega, "z", angle);
     return finished;
 }

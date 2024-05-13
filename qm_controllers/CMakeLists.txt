@@ -80,8 +80,8 @@ target_compile_options(${PROJECT_NAME} PUBLIC ${OCS2_CXX_FLAGS})
 ##  EXE  ##
 ###########
 add_executable(qm_target_trajectories_publisher
-#      src/QmTargetTrajectoriesPublisher_node.cpp
-     src/myQmTargetTrajPub.cpp
+     src/QmTargetTrajectoriesPublisher_node.cpp
+#      src/myQmTargetTrajPub.cpp
      src/QmTargetTrajectoriesPublisher.cpp
      src/GaitJoyPublisher.cpp
      )
@@ -92,6 +92,48 @@ target_link_libraries(qm_target_trajectories_publisher
      ${catkin_LIBRARIES}
      )
 target_compile_options(qm_target_trajectories_publisher PRIVATE ${OCS2_CXX_FLAGS})
+
+add_executable(qm_target_trajectories_publisher2
+#      src/QmTargetTrajectoriesPublisher_node.cpp
+     src/myQmTargetTrajPub.cpp
+     src/QmTargetTrajectoriesPublisher.cpp
+     src/GaitJoyPublisher.cpp
+     )
+add_dependencies(qm_target_trajectories_publisher2
+     ${catkin_EXPORTED_TARGETS}
+     )
+target_link_libraries(qm_target_trajectories_publisher2
+     ${catkin_LIBRARIES}
+     )
+target_compile_options(qm_target_trajectories_publisher2 PRIVATE ${OCS2_CXX_FLAGS})
+
+add_executable(qm_target_trajectories_publisher3
+#      src/QmTargetTrajectoriesPublisher_node.cpp
+     src/my2.cpp
+     src/QmTargetTrajectoriesPublisher.cpp
+     src/GaitJoyPublisher.cpp
+     )
+add_dependencies(qm_target_trajectories_publisher3
+     ${catkin_EXPORTED_TARGETS}
+     )
+target_link_libraries(qm_target_trajectories_publisher3
+     ${catkin_LIBRARIES}
+     )
+target_compile_options(qm_target_trajectories_publisher3 PRIVATE ${OCS2_CXX_FLAGS})
+
+add_executable(qm_target_trajectories_publisher4
+#      src/QmTargetTrajectoriesPublisher_node.cpp
+     src/my3.cpp
+     src/QmTargetTrajectoriesPublisher.cpp
+     src/GaitJoyPublisher.cpp
+     )
+add_dependencies(qm_target_trajectories_publisher4
+     ${catkin_EXPORTED_TARGETS}
+     )
+target_link_libraries(qm_target_trajectories_publisher4
+     ${catkin_LIBRARIES}
+     )
+target_compile_options(qm_target_trajectories_publisher4 PRIVATE ${OCS2_CXX_FLAGS})
 
 add_executable(marker_pose_publisher src/MarkerPosePublisher.cpp)
 target_link_libraries(marker_pose_publisher ${catkin_LIBRARIES})

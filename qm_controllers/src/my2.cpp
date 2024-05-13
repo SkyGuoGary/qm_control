@@ -218,7 +218,7 @@ TargetTrajectories EEgoalPoseToTargetTrajectories(const Eigen::Vector3d &positio
         vector_t target(6);
         target.setZero();
         target = BaseCurrenPose;
-        double delta_x = 0.6, delta_y = 0.1;
+        double delta_x = 0.25, delta_y = -0.18;
         // double delta_x = 0.45, delta_y = 0.09;
         double dx = delta_x * cos(yaw) - delta_y * sin(yaw);
         double dy = delta_x * sin(yaw) + delta_y * cos(yaw);
@@ -226,7 +226,7 @@ TargetTrajectories EEgoalPoseToTargetTrajectories(const Eigen::Vector3d &positio
         target(0) = position(0) - dx;
         target(1) = position(1) - dy;
         target(2) = COM_HEIGHT;
-        target(3) = yaw;
+        target(3) = yaw -0.1;
         target(4) = 0;
         target(5) = 0;
         return target;
